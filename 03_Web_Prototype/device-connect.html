@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NeuroGift | Device Connect</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: { extend: { fontFamily: { sans: ['Inter','sans-serif'] } } }
+    }
+  </script>
+
+  <style>
+    body{
+      background-image:url('bg.png');
+      background-size:cover;
+      background-position:center;
+      background-repeat:no-repeat;
+      background-attachment:fixed;
+    }
+    .overlay{
+      background:
+        radial-gradient(circle at 50% 30%, rgba(18,48,92,0.35), rgba(7,10,18,0.92) 65%),
+        linear-gradient(to bottom, rgba(10,14,23,0.35), rgba(10,14,23,0.92));
+    }
+
+    /* Big glass card like Figma */
+    .glass{
+      border-radius: 28px;
+      background: rgba(10, 16, 30, 0.38);
+      border: 1px solid rgba(255,255,255,0.14);
+      box-shadow:
+        0 40px 90px rgba(0,0,0,0.55),
+        inset 0 0 0 1px rgba(255,255,255,0.06);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      overflow: hidden;
+      position: relative;
+    }
+    .glass::before{
+      content:"";
+      position:absolute; inset:0;
+      pointer-events:none;
+      background:
+        radial-gradient(900px 420px at 50% -10%, rgba(255,255,255,0.20), transparent 60%),
+        radial-gradient(600px 300px at 20% 0%, rgba(75,233,255,0.12), transparent 60%),
+        radial-gradient(600px 300px at 80% 0%, rgba(213,166,255,0.10), transparent 60%);
+      opacity:0.85;
+    }
+
+    /* Progress bar style */
+    .bar{
+      height: 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.14);
+      overflow: hidden;
+    }
+    .fill{
+      height: 100%;
+      width: 0%;
+      border-radius: 999px;
+      background: linear-gradient(90deg,#6D1FD3 0%, #D5A6FF 45%, #4BE9FF 100%);
+      box-shadow: 0 0 22px rgba(75,233,255,0.18);
+      transition: width 650ms ease;
+    }
+
+    /* Spinner */
+    .spin{
+      width: 38px; height: 38px;
+      border-radius: 999px;
+      border: 3px solid rgba(255,255,255,0.18);
+      border-top-color: rgba(75,233,255,0.70);
+      animation: s 0.9s linear infinite;
+    }
+    @keyframes s { to { transform: rotate(360deg);} }
+
+    /* Fit */
+    .fit-vh{ transform-origin: top center; }
+    @media (max-height: 820px){ .fit-vh{ transform: scale(.95); } }
+    @media (max-height: 760px){ .fit-vh{ transform: scale(.9); } }
+    @media (max-height: 700px){ .fit-vh{ transform: scale(.85); } }
+
+    /* Page transition (optional) */
+    .page-enter { opacity: 1; transform: translateY(0); transition: 320ms ease; }
+    .page-leave { opacity: 0; transform: translateY(10px); }
+  </style>
+</head>
+
+<body class="font-sans text-white h-screen overflow-hidden relative">
+  <div class="overlay absolute inset-0 z-0"></div>
+
+  <main class="relative z-10 h-screen flex items-center justify-center px-6">
+    <div id="page" class="page-enter fit-vh w-full max-w-4xl">
+
+      <!-- HEADER (small) -->
+      <div class="flex items-center justify-between mb-4">
+        <button onclick="go('dashboard.html')" class="text-sm text-white/60 hover:text-white transition">
+          ← Back
+        </button>
+        <img src="logo.png" alt="NeuroGift" class="w-10 h-10 object-contain drop-shadow-[0_0_16px_rgba(56,189,248,0.5)]">
+      </div>
+
+      <!-- MAIN CARD -->
+      <section class="glass p-8 sm:p-10">
+        <div class="relative z-10">
+
+          <!-- STATE A: Loading (left design in your figma) -->
+          <div id="stateLoading" class="block">
+            <div class="flex flex-col items-center text-center">
+              <img src="logo.png" alt="NeuroGift Logo"
+                   class="w-20 h-20 sm:w-24 sm:h-24 object-contain drop-shadow-[0_0_26px_rgba(120,200,255,0.45)] mb-3">
+              <div class="text-3xl sm:text-4xl font-extrabold tracking-tight">
+                Neuro<span class="text-sky-200">Gift</span>
+              </div>
+              <div class="text-white/55 italic mt-2">
+                powered by EEG &amp; AI Technology
+              </div>
+
+              <div class="mt-7 spin"></div>
+
+              <div class="mt-5 text-white/55 text-sm">
+                Initializing connection module…
+              </div>
+            </div>
+          </div>
+
+          <!-- STATE B: Searching (right design in your figma) -->
+          <div id="stateSearching" class="hidden">
+            <div class="flex flex-col items-center text-center">
+              <img src="device.png" alt="NeuroGift Device"
+                   class="w-[260px] sm:w-[300px] object-contain drop-shadow-[0_0_26px_rgba(120,200,255,0.18)] mb-6">
+
+              <div class="w-full max-w-md">
+                <div class="bar">
+                  <div id="fill" class="fill"></div>
+                </div>
+
+                <div id="searchText" class="mt-4 text-sky-200/90 italic font-semibold">
+                  Searching..
+                </div>
+                <div class="mt-2 text-white/50 text-sm">
+                  Keep the headset nearby and powered on.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- STATE C: Found -->
+          <div id="stateFound" class="hidden">
+            <div class="flex flex-col items-center text-center">
+              <img src="device.png" alt="NeuroGift Device"
+                   class="w-[260px] sm:w-[300px] object-contain drop-shadow-[0_0_26px_rgba(120,200,255,0.18)] mb-6">
+
+              <div class="w-full max-w-md">
+                <div class="bar">
+                  <div class="fill" style="width:100%"></div>
+                </div>
+
+                <div class="mt-4 text-emerald-200 font-semibold">
+                  ✅ Device Found: NeuroGift-X1
+                </div>
+                <div class="mt-2 text-white/55 text-sm">
+                  Connection stable. Ready to start calibration.
+                </div>
+
+                <button
+                  id="nextBtn"
+                  onclick="go('assessment.html')"
+                  class="mt-7 w-full h-12 rounded-2xl
+                         bg-[#6D1FD3] hover:bg-[#7B2BE6]
+                         text-white font-semibold
+                         shadow-[0_10px_30px_rgba(109,31,211,0.25)]
+                         active:scale-[0.99]
+                         transition"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    function go(url){
+      const page = document.getElementById('page');
+      page.classList.add('page-leave');
+      setTimeout(()=> window.location.href = url, 220);
+    }
+
+    // Optional auth gate:
+    (async function requireAuth(){
+      try{
+        const res = await fetch("./api/me.php", { method: "GET" });
+        const data = await res.json();
+        if(!data.ok) window.location.href = "login.html";
+      }catch(e){
+        // for demo, ignore
+      }
+    })();
+
+    // Demo flow:
+    // Loading 1.2s -> Searching 2.5s -> Found
+    const stateLoading   = document.getElementById("stateLoading");
+    const stateSearching = document.getElementById("stateSearching");
+    const stateFound     = document.getElementById("stateFound");
+    const fill           = document.getElementById("fill");
+
+    function show(el){
+      stateLoading.classList.add("hidden");
+      stateSearching.classList.add("hidden");
+      stateFound.classList.add("hidden");
+      el.classList.remove("hidden");
+    }
+
+    // A) Loading
+    show(stateLoading);
+
+    setTimeout(() => {
+      // B) Searching
+      show(stateSearching);
+
+      // Animate progress in chunks (looks like figma frames)
+      const steps = [8, 18, 28, 40, 55, 70, 85];
+      let i = 0;
+      const t = setInterval(() => {
+        fill.style.width = steps[i] + "%";
+        i++;
+        if(i >= steps.length) clearInterval(t);
+      }, 350);
+
+      // C) Found after ~2.5 sec
+      setTimeout(() => {
+        show(stateFound);
+      }, 2500);
+
+    }, 1200);
+  </script>
+</body>
+</html>

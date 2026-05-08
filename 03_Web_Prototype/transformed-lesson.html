@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NeuroGift | Transformed Lesson</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter','sans-serif'] },
+          boxShadow: {
+            neon: "0 0 22px rgba(44,174,255,0.28), 0 0 0 1px rgba(44,174,255,0.14)",
+            glass: "0 30px 110px rgba(0,0,0,0.70), inset 0 0 0 1px rgba(255,255,255,0.06)",
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    :root{
+      --bg:#020617;
+      --panel: rgba(15, 23, 42, 0.62);
+      --stroke: rgba(255,255,255,0.10);
+      --stroke2: rgba(255,255,255,0.07);
+      --cyan:#2CAEFF;
+      --blue:#0B4DFF;
+      --purple:#6D1FD3;
+      --textDim: rgba(255,255,255,0.62);
+    }
+
+    body{
+      background: var(--bg);
+      color:#fff;
+      overflow-x:hidden;
+    }
+
+    .circuit-bg{
+      position: fixed; inset:0; z-index:-3;
+      background-image:
+        linear-gradient(to right, rgba(44,174,255,0.035) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(44,174,255,0.035) 1px, transparent 1px);
+      background-size: 56px 56px;
+    }
+
+    .glow-field{
+      position: fixed; inset:0; z-index:-2;
+      background:
+        radial-gradient(circle at 50% 14%, rgba(44,174,255,0.11), transparent 55%),
+        radial-gradient(circle at 70% 45%, rgba(109,31,211,0.10), transparent 60%),
+        radial-gradient(circle at 10% 60%, rgba(44,174,255,0.06), transparent 60%),
+        linear-gradient(to bottom, rgba(2,6,23,0.25), rgba(2,6,23,1));
+      pointer-events:none;
+    }
+
+    .scanlines{
+      position:fixed; inset:0; z-index:-1;
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(255,255,255,0.02),
+        rgba(255,255,255,0.02) 1px,
+        transparent 1px,
+        transparent 10px
+      );
+      opacity: 0.22;
+      pointer-events:none;
+    }
+
+    .panel{
+      background: var(--panel);
+      border: 1px solid var(--stroke);
+      border-radius: 26px;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 40px 140px rgba(0,0,0,0.65), inset 0 0 0 1px rgba(255,255,255,0.06);
+    }
+
+    .card{
+      border: 1px solid var(--stroke2);
+      border-radius: 22px;
+      background: rgba(255,255,255,0.03);
+      box-shadow: 0 16px 60px rgba(0,0,0,0.50);
+      transition: transform .22s ease, border-color .22s ease, background .22s ease;
+    }
+    .card:hover{
+      transform: translateY(-3px);
+      border-color: rgba(44,174,255,0.28);
+      background: rgba(255,255,255,0.045);
+    }
+
+    .btn-ghost{
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.04);
+      transition: .22s;
+    }
+    .btn-ghost:hover{ background: rgba(255,255,255,0.08); }
+
+    .btn-primary{
+      border: 1px solid rgba(44,174,255,0.35);
+      background: rgba(44,174,255,0.12);
+      transition: .22s;
+    }
+    .btn-primary:hover{
+      background: rgba(44,174,255,0.20);
+      box-shadow: 0 0 18px rgba(44,174,255,0.18);
+    }
+
+    .btn-purple{
+      border: 1px solid rgba(109,31,211,0.35);
+      background: rgba(109,31,211,0.10);
+      transition: .22s;
+    }
+    .btn-purple:hover{
+      background: rgba(109,31,211,0.18);
+      box-shadow: 0 0 18px rgba(109,31,211,0.25);
+    }
+
+    .container-web {
+      width: 100%;
+      max-width: none;
+      padding-inline: 5%;
+      margin: 0;
+    }
+    @media(min-width:640px){ .container-web{ padding-inline: 1.5rem; } }
+    @media(min-width:1024px){ .container-web{ padding-inline: 2rem; } }
+
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      border-radius:999px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.04);
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.78);
+    }
+
+    .step{
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.03);
+      border-radius: 18px;
+      padding: 12px 14px;
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+      transition: .22s;
+    }
+    .step.active{
+      border-color: rgba(44,174,255,0.35);
+      background: rgba(44,174,255,0.06);
+      box-shadow: 0 0 24px rgba(44,174,255,0.12);
+    }
+
+    .kbd{
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.05);
+      border-radius: 10px;
+      padding: 2px 8px;
+      font-size: 11px;
+      font-weight: 900;
+      color: rgba(255,255,255,0.8);
+    }
+
+    /* Graph */
+    .graph-shell{
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.02);
+      border-radius: 22px;
+      overflow:hidden;
+      position: relative;
+    }
+    .graph-shell::before{
+      content:"";
+      position:absolute; inset:0;
+      pointer-events:none;
+      background:
+        radial-gradient(680px 260px at 20% 10%, rgba(44,174,255,0.18), transparent 60%),
+        radial-gradient(680px 260px at 82% 10%, rgba(109,31,211,0.14), transparent 62%);
+      opacity: .9;
+    }
+
+    .fade-in{ animation: fadeIn .35s ease both; }
+    @keyframes fadeIn{
+      from{ opacity:0; transform: translateY(6px); }
+      to{ opacity:1; transform: translateY(0); }
+    }
+
+    .pulse-dot{
+      width:10px; height:10px; border-radius:999px;
+      background: rgba(44,174,255,0.9);
+      box-shadow: 0 0 16px rgba(44,174,255,0.35);
+      animation: dot 1.8s ease-in-out infinite;
+    }
+    @keyframes dot{
+      0%,100%{ transform: scale(1); opacity:.75; }
+      50%{ transform: scale(1.25); opacity:1; }
+    }
+
+    /* Segment tabs (prevents map overlap) */
+    .seg-tab{
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.04);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.70);
+      transition: .2s;
+      user-select:none;
+      cursor:pointer;
+      white-space: nowrap;
+    }
+    .seg-tab.active{
+      border-color: rgba(44,174,255,0.40);
+      background: rgba(44,174,255,0.10);
+      color: rgba(255,255,255,0.92);
+      box-shadow: 0 0 20px rgba(44,174,255,0.12);
+    }
+
+    /* Make everything slightly larger (eye-friendly) */
+    html{ font-size: 17px; }
+    @media(min-width:1024px){ html{ font-size: 18px; } }
+
+    /* PRINT / PDF */
+    @media print{
+      body{ background:#fff !important; color:#000 !important; }
+      .circuit-bg, .glow-field, .scanlines, nav, #videoCard, #leftColumn { display:none !important; }
+      .container-web{ padding-inline: 0 !important; }
+      .card, .panel{ background:#fff !important; border:1px solid #ddd !important; box-shadow:none !important; }
+      #pdfHeader{ display:block !important; }
+      #graphSvg text{ fill:#111 !important; }
+    }
+  </style>
+</head>
+
+<body class="font-sans">
+  <div class="circuit-bg"></div>
+  <div class="glow-field"></div>
+  <div class="scanlines"></div>
+
+  <!-- TOP BAR -->
+  <nav class="sticky top-0 z-50 border-b border-white/5 bg-black/35 backdrop-blur-md">
+    <div class="container-web py-4 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <img src="logo.png" alt="NeuroGift" class="w-10 h-10 drop-shadow-[0_0_10px_rgba(44,174,255,0.28)]">
+        <div class="leading-none">
+          <div class="text-lg font-black italic tracking-tighter">
+            NEURO<span class="text-sky-400">GIFT</span>
+          </div>
+          <div class="text-[10px] text-white/40 tracking-[0.28em] font-bold uppercase">Transformed Lesson</div>
+        </div>
+      </div>
+
+      <div class="hidden md:flex items-center gap-10 text-xs font-bold text-white/60">
+        <a href="courses.html" class="hover:text-sky-400 transition uppercase tracking-widest">Home</a>
+        <a href="full-courses.html" class="hover:text-sky-400 transition uppercase tracking-widest">Courses</a>
+        <a href="dashboard.html" class="hover:text-sky-400 transition uppercase tracking-widest">Dashboard</a>
+      </div>
+
+      <div class="flex items-center gap-3 ml-auto">
+        <div class="hidden sm:flex items-center gap-2">
+          <span class="pulse-dot"></span>
+          <div class="text-[10px] text-white/35 font-black tracking-widest uppercase">Pattern</div>
+          <div class="text-sm font-black text-sky-400">Visual-Spatial</div>
+        </div>
+
+        <button id="exportPdfBtn" class="px-4 py-2 rounded-xl btn-purple text-[11px] font-black uppercase tracking-widest">
+          Export PDF
+        </button>
+
+        <button id="backBtn" class="px-4 py-2 rounded-xl btn-ghost text-[11px] font-black uppercase tracking-widest">
+          ← Back
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <header class="container-web pt-10">
+    <div class="panel p-6 sm:p-8 lg:p-10 relative overflow-hidden">
+      <div class="absolute top-0 right-0 p-4 opacity-20 pointer-events-none">
+        <svg width="240" height="240" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M14 14H112V112" stroke="#2CAEFF" stroke-width="2"/>
+          <circle cx="112" cy="112" r="5" fill="#2CAEFF"/>
+          <path d="M186 44H118V120" stroke="#6D1FD3" stroke-width="2" opacity="0.8"/>
+          <circle cx="118" cy="120" r="5" fill="#6D1FD3" opacity="0.9"/>
+        </svg>
+      </div>
+
+      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+        <div class="max-w-3xl">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="chip"><span class="text-sky-400">●</span> NeuroGift Transform</span>
+            <span class="chip">Demo</span>
+            <span class="chip">~20 min segmented</span>
+          </div>
+
+          <h1 class="mt-5 text-3xl sm:text-4xl lg:text-[46px] font-black tracking-tighter leading-[1.05]">
+            Turn a theory-heavy lesson into a
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-blue-500">visual learning system</span>
+          </h1>
+
+          <p class="mt-4 text-white/60 text-base leading-relaxed">
+            We split the lesson minute-by-minute → each segment becomes a concept map + flow + flashcards + keywords.
+            <span class="text-white/35">Prototype that shows value fast to judges.</span>
+          </p>
+
+          <div class="mt-5 flex flex-wrap gap-3">
+            <button id="generateAllBtn" class="px-5 py-3 rounded-2xl btn-primary text-[11px] font-black uppercase tracking-widest">
+              Generate all segments
+            </button>
+            <button id="resetBtn" class="px-5 py-3 rounded-2xl btn-ghost text-[11px] font-black uppercase tracking-widest">
+              Reset
+            </button>
+          </div>
+        </div>
+
+        <div class="w-full lg:w-[380px] card p-5">
+          <div class="text-[10px] font-black tracking-[0.30em] uppercase text-white/45">Selected course</div>
+          <div class="mt-2 text-xl font-extrabold">Database Fundamentals — Intro (segmented)</div>
+          <div class="mt-2 text-white/55 text-sm">
+            Platform: YouTube · Video ID: <span class="text-white/75 font-black">tTzR-cyezuQ</span>
+          </div>
+          <div class="mt-4 text-white/45 text-sm leading-relaxed">
+            Judges line: “We don’t just recommend courses — we <span class="text-white/70 font-bold">reformat content</span> into the learner’s brain pattern.”
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main class="container-web py-10">
+    <!-- Hidden header for PDF -->
+    <div id="pdfHeader" class="hidden mb-6">
+      <h2 class="text-2xl font-black">NeuroGift Transform — PDF Export</h2>
+      <p class="text-sm text-black/70">Generated visual learning assets from the segmented lesson.</p>
+      <hr class="my-4">
+    </div>
+
+    <div class="grid lg:grid-cols-12 gap-6">
+      <!-- LEFT: VIDEO + SEGMENTS -->
+      <section id="leftColumn" class="lg:col-span-5 space-y-6">
+        <div id="videoCard" class="card p-5">
+          <div class="flex items-center justify-between gap-3">
+            <div>
+              <div class="text-[10px] font-black tracking-[0.30em] uppercase text-white/45">Lesson video</div>
+              <div class="mt-2 text-white/70 text-sm">Use segments to generate visuals—clean & judge-friendly.</div>
+            </div>
+            <div class="text-[11px] font-black text-white/55">Length: ~20 min</div>
+          </div>
+
+          <div class="mt-4 overflow-hidden rounded-2xl border border-white/10 bg-black/30">
+            <iframe
+              id="videoFrame"
+              class="w-full aspect-video"
+              src="https://www.youtube.com/embed/tTzR-cyezuQ?rel=0"
+              title="YouTube video player"
+              frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerpolicy="strict-origin-when-cross-origin"
+              allowfullscreen></iframe>
+          </div>
+
+          <div class="mt-4 text-white/45 text-sm">
+            Tip: During demo, click <span class="kbd">Generate</span> per segment—each one produces visible assets instantly.
+          </div>
+        </div>
+
+        <div class="card p-5">
+          <div class="flex items-center justify-between gap-3">
+            <div>
+              <div class="text-[10px] font-black tracking-[0.30em] uppercase text-white/45">Segments</div>
+              <div class="mt-2 text-white/70 text-sm">Generate → assets appear on the right. No overlap, no chaos.</div>
+            </div>
+            <div class="text-[11px] text-white/35 font-bold whitespace-nowrap">
+              Status: <span id="segStatus" class="text-sky-400">Ready</span>
+            </div>
+          </div>
+
+          <div id="segmentsList" class="mt-4 flex flex-col gap-3"></div>
+        </div>
+      </section>
+
+      <!-- RIGHT: VISUAL OUTPUT -->
+      <section class="lg:col-span-7 space-y-6">
+        <!-- Graph / Map -->
+        <div class="card p-5">
+          <div class="flex items-start justify-between gap-4">
+            <div class="min-w-0">
+              <div class="text-[10px] font-black tracking-[0.30em] uppercase text-white/45">Visual output</div>
+              <div class="mt-2 text-2xl font-black tracking-tight">
+                Concept Map Builder
+                <span class="text-sky-400">· Segment View</span>
+              </div>
+              <div class="mt-2 text-white/55 text-sm">
+                Each segment gets its own clean map. Switch segments using tabs below.
+              </div>
+            </div>
+
+            <div class="shrink-0 flex items-center gap-2">
+              <button id="copyKeywordsBtn" class="px-4 py-2 rounded-xl btn-ghost text-[11px] font-black uppercase tracking-widest">
+                Copy keywords
+              </button>
+            </div>
+          </div>
+
+          <!-- Segment Tabs -->
+          <div id="segTabs" class="mt-4 flex flex-wrap gap-2"></div>
+
+          <div class="mt-4 graph-shell p-4">
+            <div class="relative z-10">
+              <svg id="graphSvg" viewBox="0 0 900 420" class="w-full h-auto">
+                <defs>
+                  <linearGradient id="edgeGrad" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0" stop-color="rgba(44,174,255,0.65)"/>
+                    <stop offset="1" stop-color="rgba(109,31,211,0.55)"/>
+                  </linearGradient>
+                  <filter id="glow">
+                    <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                    <feMerge>
+                      <feMergeNode in="coloredBlur"/>
+                      <feMergeNode in="SourceGraphic"/>
+                    </feMerge>
+                  </filter>
+                </defs>
+
+                <g id="edgesLayer"></g>
+                <g id="nodesLayer"></g>
+
+                <text id="mapHint" x="22" y="395" fill="rgba(255,255,255,0.45)" font-size="16" font-weight="800">
+                  Generate a segment to build its concept map.
+                </text>
+              </svg>
+            </div>
+          </div>
+
+          <div class="mt-4 flex flex-wrap gap-2" id="keywordsChips"></div>
+        </div>
+
+        <!-- Flow -->
+        <div class="card p-5">
+          <div class="flex items-center justify-between gap-3">
+            <div>
+              <div class="text-[10px] font-black tracking-[0.30em] uppercase text-white/45">Flow diagram</div>
+              <div class="mt-2 text-white/70 text-sm">Turns “paragraph talk” into a visual pipeline.</div>
+            </div>
+            <div class="text-[11px] text-white/35 font-bold">
+              Mode: <span class="text-sky-400">Visual</span>
+            </div>
+          </div>
+
+          <div id="flowRow" class="mt-4 flex flex-wrap gap-3"></div>
+        </div>
+
+        <!-- Flashcards + Progress -->
+        <div class="grid md:grid-cols-2 gap-6">
+          <div class="card p-5">
+            <div class="text-[10px] font-black tracking-[0.30em] uppercase text-white/45">Flashcards</div>
+            <div class="mt-2 text-white/70 text-sm">Real content from the lesson—short anchors.</div>
+            <div id="cardsGrid" class="mt-4 grid gap-3"></div>
+          </div>
+
+          <div class="card p-5">
+            <div class="flex items-center justify-between gap-3">
+              <div>
+                <div class="text-[10px] font-black tracking-[0.30em] uppercase text-white/45">Build progress</div>
+                <div class="mt-2 text-white/70 text-sm">What got generated so far.</div>
+              </div>
+              <div class="text-[11px] text-white/35 font-bold">
+                Steps: <span id="doneCount" class="text-sky-400">0</span>/<span id="totalCount">0</span>
+              </div>
+            </div>
+
+            <div id="stepsList" class="mt-4 flex flex-col gap-3"></div>
+
+            <div class="mt-4 text-white/45 text-sm">
+              Judges line: “We convert content into a structured visual system — faster recall, less cognitive load.”
+            </div>
+          </div>
+        </div>
+
+      </section>
+    </div>
+
+    <footer class="pt-12 text-center">
+      <div class="text-[10px] text-white/25 font-black tracking-[0.4em] uppercase">
+        Powered by NeuroGift AI Engine · Demo Build
+      </div>
+      <div class="mt-3 text-[11px] text-white/35">
+        Privacy · About · Contact
+      </div>
+    </footer>
+  </main>
+
+  <script>
+    // =====================================
+    // Demo Data (segments + generated outputs) — Based on your minute-by-minute breakdown
+    // =====================================
+    const USER_PATTERN = "visual";
+
+    const SEGMENTS = [
+      {
+        id: "s1",
+        time: "00:00–04:00",
+        title: "Why Databases Matter + Learning Method",
+        summary: "Databases are essential; learn fundamentals first because principles transfer across systems.",
+        output: {
+          nodes: [
+            { id:"goal", label:"WHY DB?", x:450, y:80, type:"core" },
+            { id:"dev", label:"PROGRAMMER", x:220, y:190, type:"pill" },
+            { id:"files", label:"FILES PAIN", x:220, y:310, type:"pill" },
+            { id:"fun", label:"EASY + FUN", x:680, y:190, type:"pill" },
+            { id:"method", label:"LEARN BASICS", x:680, y:310, type:"pill" },
+          ],
+          edges: [
+            ["goal","dev"],["goal","files"],["goal","fun"],["goal","method"]
+          ],
+          keywords: ["fundamentals","transferable concepts","files vs db","methodology"],
+          flow: ["PROBLEM (FILES)","NEED (DB)","LEARN BASICS","APPLY ANY DBMS","CONFIDENCE"],
+          cards: [
+            { q:"Why learn databases?", a:"Because nearly every real system needs organized, queryable data." },
+            { q:"Core learning rule", a:"Learn one DB well → others become easier (shared principles)." },
+            { q:"Big promise", a:"Databases replace file chaos with structure and relationships." }
+          ]
+        }
+      },
+      {
+        id: "s2",
+        time: "04:00–06:00",
+        title: "What is a Database? + DBMS",
+        summary: "Database is organized facts/data—not “Oracle only”. DBMS is the system to manage data safely.",
+        output: {
+          nodes: [
+            { id:"db", label:"DATABASE", x:450, y:85, type:"core" },
+            { id:"facts", label:"ORGANIZED FACTS", x:230, y:200, type:"pill" },
+            { id:"notapp", label:"NOT JUST ORACLE", x:680, y:200, type:"pill" },
+            { id:"dbms", label:"DBMS", x:450, y:320, type:"entity" },
+          ],
+          edges: [
+            ["db","facts"],["db","notapp"],["db","dbms"]
+          ],
+          keywords: ["database","organized data","DBMS","management system"],
+          flow: ["DATA","DATABASE","DBMS","STORE/RETRIEVE","CONTROL"],
+          cards: [
+            { q:"Database", a:"A collection of organized data (facts) that you can query and update." },
+            { q:"Common misconception", a:"Database ≠ a single product (Oracle). Products are DBMS tools." },
+            { q:"DBMS", a:"Software that creates, manages, secures, and queries the database." }
+          ]
+        }
+      },
+      {
+        id: "s3",
+        time: "06:00–09:00",
+        title: "DBMS Types: File System vs RDBMS",
+        summary: "File systems store data but without relationships. RDBMS connects data via relations (the main focus).",
+        output: {
+          nodes: [
+            { id:"types", label:"DBMS TYPES", x:450, y:70, type:"core" },
+            { id:"fs", label:"FILE SYSTEM", x:240, y:200, type:"entity" },
+            { id:"noRel", label:"NO RELATIONS", x:240, y:320, type:"pill" },
+            { id:"rdbms", label:"RDBMS", x:660, y:200, type:"entity" },
+            { id:"rel", label:"RELATIONS", x:660, y:320, type:"pill" },
+          ],
+          edges: [
+            ["types","fs"],["fs","noRel"],["types","rdbms"],["rdbms","rel"]
+          ],
+          keywords: ["file system","RDBMS","relations","Oracle","MySQL","SQL Server"],
+          flow: ["DATA","FILE SYSTEM (HARD)","RDBMS (RELATIONS)","QUERY","RESULT"],
+          cards: [
+            { q:"File system DBMS", a:"Data exists but it’s harder to connect and maintain consistency." },
+            { q:"RDBMS", a:"Relational DBMS: organizes data into tables with relationships between them." },
+            { q:"Examples", a:"Oracle, SQL Server, MySQL (focus: relational concepts, not vendor)." }
+          ]
+        }
+      },
+      {
+        id: "s4",
+        time: "09:00–12:00",
+        title: "Why Files Are Hard + Tables Solution",
+        summary: "Flat files are hard to read/manage. Databases use tables—like Excel—to make data clear and queryable.",
+        output: {
+          nodes: [
+            { id:"pain", label:"FLAT FILE PAIN", x:250, y:120, type:"entity" },
+            { id:"read", label:"HARD TO READ", x:250, y:230, type:"pill" },
+            { id:"update", label:"HARD TO UPDATE", x:250, y:340, type:"pill" },
+            { id:"solution", label:"TABLES", x:650, y:190, type:"core" },
+            { id:"excel", label:"LIKE EXCEL", x:650, y:310, type:"pill" },
+          ],
+          edges: [
+            ["pain","read"],["pain","update"],["read","solution"],["update","solution"],["solution","excel"]
+          ],
+          keywords: ["flat files","tables","readability","structure","query"],
+          flow: ["FLAT FILE","PAIN","TABLES","QUERY","INSIGHT"],
+          cards: [
+            { q:"Flat files issue", a:"You can store data, but searching and organizing becomes messy and slow." },
+            { q:"Tables", a:"Rows + columns make data readable and structured." },
+            { q:"Visual anchor", a:"Table format = instant clarity (like spreadsheets)." }
+          ]
+        }
+      },
+      {
+        id: "s5",
+        time: "12:00–16:00",
+        title: "Splitting Data + Relationships (Dept Example)",
+        summary: "Separate employees and departments into tables. Use DepartmentID to link them (relationship).",
+        output: {
+          nodes: [
+            { id:"emp", label:"EMPLOYEES", x:260, y:140, type:"entity" },
+            { id:"dept", label:"DEPARTMENTS", x:660, y:140, type:"entity" },
+            { id:"deptid", label:"DEPARTMENT ID", x:460, y:260, type:"core" },
+            { id:"link", label:"RELATION", x:460, y:360, type:"pill" },
+          ],
+          edges: [
+            ["emp","deptid"],["dept","deptid"],["deptid","link"]
+          ],
+          keywords: ["tables split","DepartmentID","relationship","normalization (idea)","linking"],
+          flow: ["SPLIT TABLES","ADD ID","LINK","LOOKUP","CONSISTENCY"],
+          cards: [
+            { q:"Why split tables?", a:"Avoid duplication and keep data clean (employees vs departments)." },
+            { q:"Relationship", a:"DepartmentID connects an employee to the department details." },
+            { q:"Example", a:"Employee ‘Mohammed’ DeptID=1 → Department=IT." }
+          ]
+        }
+      },
+      {
+        id: "s6",
+        time: "16:00–20:00",
+        title: "Core Terminology: Rows & Columns",
+        summary: "Table has rows and columns. Row: record/tuple/entity. Column: field/attribute. Memorize these.",
+        output: {
+          nodes: [
+            { id:"table", label:"TABLE", x:450, y:75, type:"core" },
+            { id:"row", label:"ROW", x:240, y:190, type:"entity" },
+            { id:"record", label:"RECORD", x:140, y:310, type:"pill" },
+            { id:"tuple", label:"TUPLE", x:240, y:310, type:"pill" },
+            { id:"entity", label:"ENTITY", x:340, y:310, type:"pill" },
+            { id:"col", label:"COLUMN", x:660, y:190, type:"entity" },
+            { id:"field", label:"FIELD", x:560, y:310, type:"pill" },
+            { id:"attr", label:"ATTRIBUTE", x:760, y:310, type:"pill" },
+          ],
+          edges: [
+            ["table","row"],["row","record"],["row","tuple"],["row","entity"],
+            ["table","col"],["col","field"],["col","attr"]
+          ],
+          keywords: ["table","row","record","tuple","entity","column","field","attribute","entity set"],
+          flow: ["TABLE","ROWS","COLUMNS","TERMS","MEMORIZE"],
+          cards: [
+            { q:"Row synonyms", a:"Row = Record = Tuple = (sometimes) Entity." },
+            { q:"Column synonyms", a:"Column = Field = Attribute." },
+            { q:"Why this matters?", a:"Terminology helps you follow any DB/SQL course without confusion." }
+          ]
+        }
+      }
+    ];
+
+    // =====================================
+    // UI Rendering helpers
+    // =====================================
+    const $ = (id)=>document.getElementById(id);
+
+    function escapeHtml(s){
+      return String(s).replace(/[&<>"']/g, (m)=>({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+      }[m]));
+    }
+
+    function nodeStyle(type){
+      if(type === "core"){
+        return { w: 220, h: 64, r: 22, fill:"rgba(44,174,255,0.14)", stroke:"rgba(44,174,255,0.45)", text:"rgba(255,255,255,0.92)" };
+      }
+      if(type === "entity"){
+        return { w: 210, h: 74, r: 18, fill:"rgba(255,255,255,0.05)", stroke:"rgba(255,255,255,0.16)", text:"rgba(255,255,255,0.88)" };
+      }
+      if(type === "pill"){
+        return { w: 200, h: 56, r: 999, fill:"rgba(255,255,255,0.05)", stroke:"rgba(255,255,255,0.14)", text:"rgba(255,255,255,0.85)" };
+      }
+      return { w: 160, h: 48, r: 999, fill:"rgba(109,31,211,0.10)", stroke:"rgba(109,31,211,0.30)", text:"rgba(255,255,255,0.86)" };
+    }
+
+    function clearMap(){
+      $("edgesLayer").innerHTML = "";
+      $("nodesLayer").innerHTML = "";
+      $("mapHint").textContent = "Generate a segment to build its concept map.";
+    }
+
+    function clearOutputs(){
+      clearMap();
+      $("keywordsChips").innerHTML = "";
+      $("flowRow").innerHTML = "";
+      $("cardsGrid").innerHTML = "";
+      $("stepsList").innerHTML = "";
+      $("doneCount").textContent = "0";
+      $("segStatus").textContent = "Ready";
+      $("segStatus").className = "text-sky-400";
+      $("segTabs").innerHTML = "";
+    }
+
+    function renderSegments(){
+      const list = $("segmentsList");
+      list.innerHTML = SEGMENTS.map(seg => `
+        <div class="step" id="step_${seg.id}">
+          <div class="min-w-0">
+            <div class="text-[11px] font-black tracking-widest uppercase text-white/35">${escapeHtml(seg.time)}</div>
+            <div class="mt-1 text-lg font-extrabold">${escapeHtml(seg.title)}</div>
+            <div class="mt-1 text-white/55 text-sm leading-relaxed">${escapeHtml(seg.summary)}</div>
+          </div>
+          <div class="shrink-0 flex flex-col gap-2 items-end">
+            <button class="px-4 py-2 rounded-xl btn-primary text-[11px] font-black uppercase tracking-widest"
+                    onclick="generateSegment('${seg.id}')">
+              Generate
+            </button>
+            <button class="px-4 py-2 rounded-xl btn-ghost text-[11px] font-black uppercase tracking-widest"
+                    onclick="focusSegment('${seg.id}')">
+              Focus
+            </button>
+          </div>
+        </div>
+      `).join("");
+
+      $("totalCount").textContent = String(SEGMENTS.length);
+      renderStepsProgress();
+      renderTabs();
+    }
+
+    function renderStepsProgress(doneSet = doneSegments){
+      const steps = $("stepsList");
+      steps.innerHTML = SEGMENTS.map((seg, idx) => {
+        const done = doneSet.has(seg.id);
+        const badge = done
+          ? `<span class="text-emerald-300 font-black">✅ Done</span>`
+          : `<span class="text-white/35 font-black">⏳ Pending</span>`;
+        return `
+          <div class="step ${done ? "active" : ""}">
+            <div class="min-w-0">
+              <div class="text-[10px] font-black tracking-[0.30em] uppercase text-white/40">Segment ${idx+1}</div>
+              <div class="mt-1 font-extrabold">${escapeHtml(seg.title)}</div>
+              <div class="mt-1 text-white/45 text-sm">${escapeHtml(seg.time)}</div>
+            </div>
+            <div class="shrink-0 text-sm">${badge}</div>
+          </div>
+        `;
+      }).join("");
+      $("doneCount").textContent = String(doneSet.size);
+    }
+
+    function renderTabs(){
+      const tabs = $("segTabs");
+      tabs.innerHTML = SEGMENTS.map((seg, idx)=>`
+        <div class="seg-tab ${seg.id===activeSegId ? "active":""}" onclick="switchActiveSegment('${seg.id}')">
+          S${idx+1}
+        </div>
+      `).join("");
+    }
+
+    // =====================================
+    // Segment view state (NO OVERLAP)
+    // =====================================
+    const doneSegments = new Set();
+    const segmentOutputs = new Map(); // segId -> { nodes, edges, keywords, flow, cards }
+    let activeSegId = SEGMENTS[0].id;
+
+    function focusSegment(segId){
+      SEGMENTS.forEach(s => {
+        const el = $("step_" + s.id);
+        if(!el) return;
+        el.classList.toggle("active", s.id === segId);
+      });
+      $("segStatus").textContent = "Focused";
+      $("segStatus").className = "text-purple-300";
+      activeSegId = segId;
+      renderTabs();
+      // NOTE: No scrolling. (You asked)
+    }
+
+    function switchActiveSegment(segId){
+      activeSegId = segId;
+      focusSegment(segId);
+      // If we already generated this segment, re-render its assets
+      if(segmentOutputs.has(segId)){
+        renderSegmentAssets(segId, { animate:false });
+      }else{
+        // Clear map for “empty segment” view
+        clearMap();
+        $("flowRow").innerHTML = "";
+        $("cardsGrid").innerHTML = "";
+        // keep keywords as global (we keep them aggregated)
+      }
+    }
+
+    // =====================================
+    // Graph rendering (per segment)
+    // =====================================
+    function addEdge(A, B, animate=true){
+      const x1 = A.x, y1 = A.y;
+      const x2 = B.x, y2 = B.y;
+
+      const el = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      el.setAttribute("d", `M ${x1} ${y1} C ${(x1+x2)/2} ${y1-40}, ${(x1+x2)/2} ${y2+40}, ${x2} ${y2}`);
+      el.setAttribute("stroke", "url(#edgeGrad)");
+      el.setAttribute("stroke-width", "3");
+      el.setAttribute("fill", "none");
+      el.setAttribute("opacity", "0.85");
+      el.setAttribute("filter", "url(#glow)");
+      if(animate) el.classList.add("fade-in");
+      $("edgesLayer").appendChild(el);
+    }
+
+    function addNode(n, animate=true){
+      const style = nodeStyle(n.type);
+
+      const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+      if(animate) g.classList.add("fade-in");
+
+      const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+      rect.setAttribute("x", n.x - style.w/2);
+      rect.setAttribute("y", n.y - style.h/2);
+      rect.setAttribute("width", style.w);
+      rect.setAttribute("height", style.h);
+      rect.setAttribute("rx", style.r);
+      rect.setAttribute("fill", style.fill);
+      rect.setAttribute("stroke", style.stroke);
+      rect.setAttribute("stroke-width", "2");
+      rect.setAttribute("filter", "url(#glow)");
+
+      const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      text.setAttribute("x", n.x);
+      text.setAttribute("y", n.y + 6);
+      text.setAttribute("text-anchor", "middle");
+      text.setAttribute("fill", style.text);
+      text.setAttribute("font-size", "18");
+      text.setAttribute("font-weight", "900");
+      text.textContent = n.label;
+
+      g.appendChild(rect);
+      g.appendChild(text);
+      $("nodesLayer").appendChild(g);
+    }
+
+    function renderKeywords(globalKeywords){
+      const wrap = $("keywordsChips");
+      const arr = Array.from(globalKeywords);
+      wrap.innerHTML = arr.map(k => `
+        <span class="inline-flex items-center gap-2 px-3 py-2 rounded-full border border-white/10 bg-white/5 text-[11px] font-black tracking-widest uppercase text-white/70">
+          ${escapeHtml(k)}
+        </span>
+      `).join("");
+    }
+
+    function renderFlow(flow){
+      const row = $("flowRow");
+      const steps = (flow || []).slice(0, 7);
+      row.innerHTML = steps.map((s, i) => `
+        <div class="inline-flex items-center gap-3 px-4 py-3 rounded-2xl border border-white/10 bg-white/5 font-black text-[11px] tracking-widest uppercase text-white/75 fade-in">
+          ${escapeHtml(s)}
+          ${i < steps.length-1 ? `<span class="text-white/30 text-lg">→</span>` : ``}
+        </div>
+      `).join("");
+    }
+
+    function renderCards(cards){
+      const grid = $("cardsGrid");
+      const items = (cards || []).slice(0, 8);
+      grid.innerHTML = items.map(c => `
+        <div class="card p-4 fade-in">
+          <div class="text-[10px] font-black tracking-[0.30em] uppercase text-white/40">Question</div>
+          <div class="mt-2 font-extrabold">${escapeHtml(c.q)}</div>
+          <div class="mt-3 text-white/60 text-sm leading-relaxed">${escapeHtml(c.a)}</div>
+        </div>
+      `).join("");
+    }
+
+    // Global keywords across all generated segments
+    const globalKeywords = new Set();
+
+    async function renderSegmentAssets(segId, opts={ animate:true }){
+      const out = segmentOutputs.get(segId);
+      if(!out) return;
+
+      clearMap();
+      $("mapHint").textContent = `${out.title} · ${out.time}`;
+      $("mapHint").classList.add("fade-in");
+
+      // build node lookup
+      const nodeById = new Map(out.nodes.map(n => [n.id, n]));
+
+      // nodes
+      for(const n of out.nodes){
+        addNode(n, opts.animate);
+        if(opts.animate) await sleep(90);
+      }
+
+      // edges
+      for(const [a,b] of out.edges){
+        const A = nodeById.get(a);
+        const B = nodeById.get(b);
+        if(A && B) addEdge(A, B, opts.animate);
+        if(opts.animate) await sleep(60);
+      }
+
+      renderFlow(out.flow);
+      renderCards(out.cards);
+      renderKeywords(globalKeywords);
+    }
+
+    async function generateSegment(segId){
+      const seg = SEGMENTS.find(s => s.id === segId);
+      if(!seg) return;
+
+      focusSegment(segId);
+      $("segStatus").textContent = "Generating…";
+      $("segStatus").className = "text-sky-300";
+
+      // simulate AI time
+      await sleep(180);
+
+      // store per-segment output (prevents overlap)
+      segmentOutputs.set(segId, {
+        title: seg.title,
+        time: seg.time,
+        nodes: seg.output.nodes,
+        edges: seg.output.edges,
+        keywords: seg.output.keywords,
+        flow: seg.output.flow,
+        cards: seg.output.cards
+      });
+
+      // merge global keywords
+      seg.output.keywords.forEach(k => globalKeywords.add(k));
+
+      doneSegments.add(segId);
+      renderStepsProgress(doneSegments);
+      renderTabs();
+
+      // render this segment assets cleanly
+      await renderSegmentAssets(segId, { animate:true });
+
+      $("segStatus").textContent = "Done";
+      $("segStatus").className = "text-emerald-300";
+    }
+
+    async function generateAll(){
+      $("segStatus").textContent = "Generating all…";
+      $("segStatus").className = "text-sky-300";
+      for(const seg of SEGMENTS){
+        if(!doneSegments.has(seg.id)){
+          await generateSegment(seg.id);
+          await sleep(120);
+        }
+      }
+      $("segStatus").textContent = "All done";
+      $("segStatus").className = "text-emerald-300";
+      // keep active on last generated, or go back to first for presentation
+      switchActiveSegment("s1");
+    }
+
+    function resetDemo(){
+      doneSegments.clear();
+      segmentOutputs.clear();
+      globalKeywords.clear();
+      activeSegId = SEGMENTS[0].id;
+
+      clearOutputs();
+      renderSegments();
+      clearMap();
+      renderKeywords(globalKeywords);
+    }
+
+    function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
+
+    async function copyKeywords(){
+      const text = Array.from(globalKeywords).join(", ");
+      if(!text){
+        alert("No keywords yet. Generate a segment first.");
+        return;
+      }
+      try{
+        await navigator.clipboard.writeText(text);
+        $("copyKeywordsBtn").textContent = "Copied ✓";
+        setTimeout(()=> $("copyKeywordsBtn").textContent = "Copy keywords", 900);
+      }catch(e){
+        alert("Copy failed. Your browser blocked it.");
+      }
+    }
+
+    function exportPDF(){
+      // Let browser print dialog create PDF
+      window.print();
+    }
+
+    // =====================================
+    // INIT
+    // =====================================
+    $("backBtn").addEventListener("click", ()=> history.back());
+    $("generateAllBtn").addEventListener("click", generateAll);
+    $("resetBtn").addEventListener("click", resetDemo);
+    $("copyKeywordsBtn").addEventListener("click", copyKeywords);
+    $("exportPdfBtn").addEventListener("click", exportPDF);
+
+    renderSegments();
+    clearOutputs();
+    renderSegments(); // keep original structure
+    renderKeywords(globalKeywords);
+    clearMap();
+
+    // Show something immediately (so you never see "empty" demo):
+    // Auto-generate first segment quickly (judges love “instant value”)
+    setTimeout(()=> generateSegment("s1"), 250);
+  </script>
+</body>
+</html>

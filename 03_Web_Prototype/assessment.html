@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>NeuroGift | Assessment</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+<script>
+tailwind.config = {
+  theme: { extend: { fontFamily:{ sans:['Inter','sans-serif'] } } }
+}
+</script>
+
+<style>
+body{
+  background-image:url('bg.png');
+  background-size:cover;
+  background-position:center;
+  background-attachment:fixed;
+}
+.overlay{
+  background:
+    radial-gradient(circle at 50% 35%, rgba(18,48,92,.35), rgba(7,10,18,.92) 70%),
+    linear-gradient(to bottom, rgba(10,14,23,.35), rgba(10,14,23,.92));
+}
+.page-enter{opacity:1;transition:.3s}
+.page-leave{opacity:0;transform:translateY(12px)}
+@keyframes eeg{0%,100%{opacity:.6}50%{opacity:1}}
+.eeg{animation:eeg 2s ease-in-out infinite}
+
+.fit-vh{ transform-origin: top center; }
+@media (max-height: 820px){ .fit-vh{ transform: scale(.95); } }
+@media (max-height: 760px){ .fit-vh{ transform: scale(.9); } }
+@media (max-height: 700px){ .fit-vh{ transform: scale(.85); } }
+</style>
+</head>
+
+<body class="h-screen overflow-hidden text-white relative font-sans">
+<div class="overlay absolute inset-0 z-0"></div>
+
+<main class="relative z-10 h-screen flex items-center justify-center px-6">
+<div id="page" class="page-enter fit-vh w-full max-w-4xl">
+
+<div class="rounded-3xl bg-white/5 border border-white/15 backdrop-blur-xl p-8">
+
+<!-- Header -->
+<div class="flex items-center justify-between mb-6">
+  <div class="flex items-center gap-4">
+    <img src="logo.png" alt="NeuroGift" class="w-14 h-14 drop-shadow-[0_0_20px_rgba(120,200,255,.35)]" />
+    <div>
+      <h1 class="text-2xl font-extrabold">Visual-Spatial Assessment</h1>
+      <p class="text-white/70 text-sm">Mental imagery tasks · EEG recording active</p>
+    </div>
+  </div>
+  <div class="text-right">
+    <p class="text-sm text-white/60">Question</p>
+    <p class="text-xl font-bold"><span id="qNum">1</span>/3</p>
+  </div>
+</div>
+
+<!-- Progress -->
+<div class="h-3 bg-white/15 rounded-full overflow-hidden mb-6">
+  <div id="progress" class="h-full w-1/3 bg-gradient-to-r from-purple-500 to-sky-400 transition-all"></div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+<!-- Question -->
+<section class="rounded-2xl bg-white/5 border border-white/15 p-6">
+  <p id="question" class="text-lg leading-relaxed mb-6"></p>
+  <div id="options" class="space-y-3"></div>
+
+  <div class="flex justify-between mt-6">
+    <button id="back" onclick="prev()" disabled
+      class="px-5 py-3 rounded-xl bg-white/5 border border-white/20 disabled:opacity-40">
+      Back
+    </button>
+    <button id="next" onclick="next()"
+      class="px-6 py-3 rounded-xl bg-[#6D1FD3] hover:bg-[#7B2BE6] font-semibold transition disabled:opacity-40">
+      Next
+    </button>
+  </div>
+
+  <p id="hint" class="mt-4 text-xs text-white/45 hidden">
+    Pick an answer to continue.
+  </p>
+</section>
+
+<!-- EEG -->
+<aside class="rounded-2xl bg-white/5 border border-white/15 p-6">
+  <div class="flex items-center justify-between mb-4">
+    <h3 class="font-bold">EEG Signal</h3>
+    <span class="text-xs px-3 py-1 rounded-full bg-emerald-400/10 border border-emerald-300/20 text-emerald-200">
+      Live
+    </span>
+  </div>
+  <div class="rounded-xl bg-black/20 border border-white/10 p-4 eeg">
+    <canvas id="wave" height="120" class="w-full"></canvas>
+  </div>
+  <p class="text-xs text-white/55 mt-3" id="eegNote">
+    Visual-spatial cognitive load detected
+  </p>
+</aside>
+
+</div>
+</div>
+</div>
+</main>
+
+<script>
+/* =========================
+   Questions
+========================= */
+const questions = [
+{
+ q:"Imagine a lowercase letter 'b'. If rotated 180 degrees, which letter does it become?",
+ options:["p","d","q","b"],
+ correct:2
+},
+{
+ q:"Imagine a white cube dipped in blue paint and cut into 27 small cubes. How many cubes have three blue faces?",
+ options:["4","6","8","12"],
+ correct:2
+},
+{
+ q:"Imagine an analog clock at 3:15. If viewed in a mirror, what time appears?",
+ options:["9:45","8:45","3:45","9:15"],
+ correct:1
+}
+];
+
+let i=0;
+const answers=[];
+
+const qEl=document.getElementById("question");
+const optEl=document.getElementById("options");
+const qNum=document.getElementById("qNum");
+const progress=document.getElementById("progress");
+const back=document.getElementById("back");
+const nextBtn=document.getElementById("next");
+const hint=document.getElementById("hint");
+
+/* =========================
+   Render UI
+========================= */
+function render(){
+  qEl.textContent=questions[i].q;
+  qNum.textContent=i+1;
+  progress.style.width=((i+1)/3*100)+"%";
+  back.disabled=i===0;
+
+  // Next label changes on last step
+  nextBtn.textContent = (i === 2) ? "Finish" : "Next";
+
+  // Require answer
+  const hasAnswer = answers[i] != null;
+  nextBtn.disabled = !hasAnswer;
+  hint.classList.toggle("hidden", hasAnswer);
+
+  optEl.innerHTML="";
+  questions[i].options.forEach((o,idx)=>{
+    const b=document.createElement("button");
+    const active = answers[i]===idx;
+    b.className = "w-full text-left px-5 py-4 rounded-xl border transition " +
+      (active
+        ? "bg-white/10 border-sky-300"
+        : "bg-white/5 border-white/20 hover:bg-white/10");
+    b.textContent=o;
+    b.onclick=()=>{
+      answers[i]=idx;
+      render();
+    };
+    optEl.appendChild(b);
+  });
+}
+
+/* =========================
+   Navigation
+========================= */
+function next(){
+  if(answers[i] == null) {
+    hint.classList.remove("hidden");
+    return;
+  }
+
+  if(i<2){
+    i++;
+    render();
+  } else {
+    // ====== Create ng_result for dashboard (probabilities) ======
+    const score = answers.filter((a,idx)=>a===questions[idx].correct).length;
+
+    // Demo mapping score -> probabilities (until backend is wired)
+    // 3/3 => very confident visual_spatial
+    // 2/3 => still visual_spatial but less confidence
+    // 0-1 => lower confidence
+    let proba;
+    if(score === 3){
+      proba = { visual_spatial: 0.88, logical: 0.08, verbal: 0.04 };
+    } else if(score === 2){
+      proba = { visual_spatial: 0.72, logical: 0.18, verbal: 0.10 };
+    } else if(score === 1){
+      proba = { visual_spatial: 0.55, logical: 0.25, verbal: 0.20 };
+    } else {
+      proba = { visual_spatial: 0.40, logical: 0.35, verbal: 0.25 };
+    }
+
+    const result = {
+      label: "visual_spatial",
+      label_display: "Visual-Spatial Intelligence",
+      score,
+      proba,
+      meta: {
+        answers,
+        ts: Date.now()
+      }
+    };
+
+    sessionStorage.setItem("ng_result", JSON.stringify(result));
+
+    go("analyzing.html");
+  }
+}
+
+function prev(){
+  i--;
+  render();
+}
+
+function go(url){
+  document.getElementById("page").classList.add("page-leave");
+  setTimeout(()=>location.href=url,220);
+}
+
+/* =========================
+   EEG Wave (Canvas animation)
+========================= */
+const canvas = document.getElementById("wave");
+const ctx = canvas.getContext("2d");
+
+function resizeCanvas(){
+  // match CSS width
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = Math.max(300, Math.floor(rect.width * devicePixelRatio));
+  canvas.height = Math.floor(120 * devicePixelRatio);
+  ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+}
+window.addEventListener("resize", resizeCanvas);
+resizeCanvas();
+
+let t = 0;
+function draw(){
+  const w = canvas.getBoundingClientRect().width;
+  const h = 120;
+
+  ctx.clearRect(0,0,w,h);
+
+  // faint grid
+  ctx.globalAlpha = 0.25;
+  ctx.strokeStyle = "rgba(255,255,255,0.25)";
+  ctx.lineWidth = 1;
+  for(let x=0; x<=w; x+=40){
+    ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,h); ctx.stroke();
+  }
+  for(let y=0; y<=h; y+=30){
+    ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke();
+  }
+
+  // wave
+  ctx.globalAlpha = 1;
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = "rgba(75,233,255,0.85)";
+
+  const mid = h/2;
+  ctx.beginPath();
+  for(let x=0; x<=w; x+=2){
+    const a = 14 * Math.sin((x*0.02) + t);
+    const b = 7  * Math.sin((x*0.05) + t*1.4);
+    const c = 3  * Math.sin((x*0.11) + t*1.9);
+    const y = mid + a + b + c;
+    if(x===0) ctx.moveTo(x,y);
+    else ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+
+  // glow
+  ctx.shadowColor = "rgba(75,233,255,0.35)";
+  ctx.shadowBlur = 14;
+  ctx.stroke();
+
+  ctx.shadowBlur = 0;
+  t += 0.05;
+  requestAnimationFrame(draw);
+}
+draw();
+
+/* Init */
+render();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NeuroGift | AI Processing</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: { extend: { fontFamily: { sans: ['Inter','sans-serif'] } } }
+    }
+  </script>
+
+  <style>
+    body{
+      background-image:url('bg.png');
+      background-size:cover;
+      background-position:center;
+      background-repeat:no-repeat;
+      background-attachment:fixed;
+    }
+    .overlay{
+      background:
+        radial-gradient(circle at 50% 35%, rgba(18,48,92,0.35), rgba(7,10,18,0.92) 70%),
+        linear-gradient(to bottom, rgba(10,14,23,0.35), rgba(10,14,23,0.92));
+    }
+
+    /* Fit to viewport */
+    .fit-vh{ transform-origin: top center; }
+    @media (max-height: 820px){ .fit-vh{ transform: scale(.95); } }
+    @media (max-height: 760px){ .fit-vh{ transform: scale(.9); } }
+    @media (max-height: 700px){ .fit-vh{ transform: scale(.85); } }
+
+    /* Card look */
+    .frame{
+      border-radius: 34px;
+      background: rgba(10,16,30,0.40);
+      border: 1px solid rgba(255,255,255,0.14);
+      box-shadow: 0 40px 100px rgba(0,0,0,0.55), inset 0 0 0 1px rgba(255,255,255,0.06);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      overflow: hidden;
+      position: relative;
+    }
+    .frame::before{
+      content:"";
+      position:absolute; inset:0;
+      pointer-events:none;
+      background:
+        radial-gradient(1200px 520px at 50% -10%, rgba(255,255,255,0.18), transparent 62%),
+        radial-gradient(900px 450px at 20% 0%, rgba(75,233,255,0.10), transparent 60%),
+        radial-gradient(900px 450px at 80% 0%, rgba(213,166,255,0.10), transparent 60%);
+      opacity:0.9;
+    }
+
+    /* Brain glow */
+    .glow-spot{
+      position:absolute;
+      width: 180px; height: 180px;
+      border-radius: 999px;
+      filter: blur(18px);
+      mix-blend-mode: screen;
+      pointer-events:none;
+      opacity: 0.85;
+      background: radial-gradient(circle,
+        rgba(255,255,255,0.70) 0%,
+        rgba(75,233,255,0.55) 30%,
+        rgba(213,166,255,0.35) 56%,
+        rgba(75,233,255,0.00) 72%
+      );
+      animation: pulse 1.9s ease-in-out infinite;
+      transform: translate(-50%,-50%);
+    }
+    @keyframes pulse{
+      0%,100% { transform: translate(-50%,-50%) scale(0.95); opacity: 0.62; }
+      50%     { transform: translate(-50%,-50%) scale(1.05); opacity: 0.95; }
+    }
+
+    /* Steps */
+    .step{
+      border-radius: 14px;
+      border: 1px solid rgba(75,233,255,0.35);
+      background: rgba(0,0,0,0.16);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.05);
+    }
+    .step.active{
+      border-color: rgba(75,233,255,0.70);
+      box-shadow:
+        0 0 0 1px rgba(75,233,255,0.15),
+        0 14px 40px rgba(75,233,255,0.10),
+        inset 0 0 0 1px rgba(255,255,255,0.07);
+    }
+    .step.done{
+      border-color: rgba(16,185,129,0.55);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06);
+    }
+
+    /* Progress bar */
+    .bar-wrap{
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.10);
+      border: 1px solid rgba(255,255,255,0.10);
+      overflow: hidden;
+    }
+    .bar-fill{
+      height: 100%;
+      width: 0%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #6D1FD3 0%, #47C5E1 55%, #4BE9FF 100%);
+      box-shadow: 0 0 24px rgba(75,233,255,0.20);
+      transition: width 420ms ease;
+    }
+
+    /* Page transition */
+    .page-enter { opacity: 1; transform: translateY(0); transition: 320ms ease; }
+    .page-leave { opacity: 0; transform: translateY(10px); }
+  </style>
+</head>
+
+<body class="font-sans text-white h-screen overflow-hidden relative">
+  <div class="overlay absolute inset-0 z-0"></div>
+
+  <main class="relative z-10 h-screen flex items-center justify-center px-6">
+    <div id="page" class="page-enter fit-vh w-full max-w-6xl">
+      <section class="frame p-6 sm:p-8">
+        <div class="relative grid grid-cols-1 lg:grid-cols-[340px_1fr] gap-6">
+
+          <!-- LEFT: Brain -->
+          <aside class="relative">
+            <div class="flex flex-col items-center">
+              <div class="relative w-full flex items-center justify-center">
+                <div class="relative">
+                  <img
+                    id="brainImg"
+                    src="brain-front.png"
+                    onerror="this.onerror=null; this.src='brain.png';"
+                    alt="Brain"
+                    class="w-[260px] sm:w-[290px] object-contain drop-shadow-[0_0_34px_rgba(120,200,255,0.22)]"
+                  />
+                  <div id="spot" class="glow-spot"></div>
+                </div>
+              </div>
+
+              <div class="mt-5 text-center px-4">
+                <div class="text-xs text-white/55 leading-relaxed">
+                  AI is processing your EEG signals and assessment responses.
+                  <br><br>
+                  Please stay still for the most accurate analysis.
+                </div>
+              </div>
+
+              <div class="w-full mt-6">
+                <div class="bar-wrap">
+                  <div id="bar" class="bar-fill"></div>
+                </div>
+                <div class="mt-2 flex items-center justify-between text-[11px] text-white/50">
+                  <span id="pct">0%</span>
+                  <span id="eta">Processing…</span>
+                </div>
+              </div>
+            </div>
+          </aside>
+
+          <!-- RIGHT: Steps -->
+          <section class="space-y-4">
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                <h1 class="text-2xl sm:text-3xl font-semibold italic tracking-tight text-white/90">
+                  AI Processing
+                </h1>
+                <p class="text-xs sm:text-sm text-white/55 mt-1">
+                  Signal cleaning · feature extraction · model inference
+                </p>
+              </div>
+
+              <button onclick="cancelToAssessment()"
+                      class="text-xs sm:text-sm text-sky-200/80 hover:text-sky-100 transition">
+                Back
+              </button>
+            </div>
+
+            <div class="h-px bg-white/15"></div>
+
+            <div class="space-y-4">
+              <div id="s1" class="step p-4 sm:p-5 flex items-center justify-between">
+                <div>
+                  <div class="text-sm sm:text-base italic text-white/85">Filtering Noise (8–30Hz)…</div>
+                  <div class="text-[11px] text-white/50 italic -mt-0.5">Band-pass + artifact smoothing</div>
+                </div>
+                <span id="t1" class="text-xs text-white/50">Queued</span>
+              </div>
+
+              <div id="s2" class="step p-4 sm:p-5 flex items-center justify-between">
+                <div>
+                  <div class="text-sm sm:text-base italic text-white/85">Extracting Features…</div>
+                  <div class="text-[11px] text-white/50 italic -mt-0.5">PSD, ratios, time-domain stats</div>
+                </div>
+                <span id="t2" class="text-xs text-white/50">Queued</span>
+              </div>
+
+              <div id="s3" class="step p-4 sm:p-5 flex items-center justify-between">
+                <div>
+                  <div class="text-sm sm:text-base italic text-white/85">Running Random Forest Model…</div>
+                  <div class="text-[11px] text-white/50 italic -mt-0.5">Class probabilities inference</div>
+                </div>
+                <span id="t3" class="text-xs text-white/50">Queued</span>
+              </div>
+
+              <div id="s4" class="step p-4 sm:p-5 flex items-center justify-between">
+                <div>
+                  <div class="text-sm sm:text-base italic text-white/85">Calculating Probabilities…</div>
+                  <div class="text-[11px] text-white/50 italic -mt-0.5">Normalization + confidence</div>
+                </div>
+                <span id="t4" class="text-xs text-white/50">Queued</span>
+              </div>
+            </div>
+
+            <div class="pt-2 text-[11px] italic text-white/45">
+              Powered by EEG-based brain signal analysis
+            </div>
+
+          </section>
+
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    // Safety: if user opens analyzing directly without results, return to assessment
+    const raw = sessionStorage.getItem("ng_result");
+    if(!raw){
+      location.href = "assessment.html";
+    }
+
+    // ✅ لا تسمين متغير JSON أبداً
+    const result = raw ? JSON.parse(raw) : null;
+    const label = result?.label || "visual_spatial";
+
+    // ===== Place glow spot by label =====
+    const POS = {
+      visual_spatial: { x: 50, y: 28 },
+      logical:        { x: 52, y: 34 },
+      verbal:         { x: 50, y: 44 },
+      focus:          { x: 50, y: 30 }
+    };
+
+    function placeGlow(){
+      const img = document.getElementById("brainImg");
+      const spot = document.getElementById("spot");
+      const pos = POS[label] || POS.visual_spatial;
+
+      const w = img.clientWidth;
+      const h = img.clientHeight;
+      spot.style.left = (pos.x/100) * w + "px";
+      spot.style.top  = (pos.y/100) * h + "px";
+    }
+
+    const img = document.getElementById("brainImg");
+    if(img.complete) placeGlow();
+    else img.addEventListener("load", placeGlow);
+    window.addEventListener("resize", placeGlow);
+
+    // ===== Progress + Steps animation =====
+    const bar = document.getElementById("bar");
+    const pct = document.getElementById("pct");
+    const eta = document.getElementById("eta");
+
+    const steps = [
+      { box:"s1", tag:"t1", start: 0,  end: 28,  dur: 900,  labelRun:"Running", labelDone:"Done ✅" },
+      { box:"s2", tag:"t2", start: 28, end: 58,  dur: 1100, labelRun:"Running", labelDone:"Done ✅" },
+      { box:"s3", tag:"t3", start: 58, end: 83,  dur: 950,  labelRun:"Running", labelDone:"Done ✅" },
+      { box:"s4", tag:"t4", start: 83, end: 100, dur: 850,  labelRun:"Running", labelDone:"Done ✅" }
+    ];
+
+    function setStepState(id, state){
+      const el = document.getElementById(id);
+      el.classList.remove("active","done");
+      if(state==="active") el.classList.add("active");
+      if(state==="done") el.classList.add("done");
+    }
+
+    function setTag(id, text, tone){
+      const el = document.getElementById(id);
+      el.textContent = text;
+      el.className = "text-xs " + (tone==="ok" ? "text-emerald-200" : tone==="run" ? "text-sky-200" : "text-white/50");
+    }
+
+    function animateRange(from, to, dur, onUpdate){
+      const t0 = performance.now();
+      return new Promise(resolve=>{
+        function tick(now){
+          const p = Math.min(1, (now - t0) / dur);
+          const v = from + (to - from) * p;
+          onUpdate(v, p);
+          if(p < 1) requestAnimationFrame(tick);
+          else resolve();
+        }
+        requestAnimationFrame(tick);
+      });
+    }
+
+    // ✅ حفظ النتيجة في DB قبل الانتقال
+    async function saveAnalysis(){
+      try{
+        const res = await fetch("./api/save_analysis.php", {
+          method: "POST",
+          headers: { "Content-Type":"application/json" },
+          credentials: "include", // ✅ مهم للسيشن
+          body: JSON.stringify({ result })
+        });
+
+        const data = await res.json().catch(()=> ({}));
+
+        if(!res.ok || !data.ok){
+          console.error("save_analysis failed:", res.status, data);
+          return false;
+        }
+
+        console.log("✅ saved to DB");
+        return true;
+
+      }catch(err){
+        console.error("save_analysis network error:", err);
+        return false;
+      }
+    }
+
+    async function run(){
+      bar.style.width = "0%";
+      pct.textContent = "0%";
+      eta.textContent = "Processing…";
+
+      for(let k=0; k<steps.length; k++){
+        const s = steps[k];
+
+        setStepState(s.box, "active");
+        setTag(s.tag, s.labelRun, "run");
+
+        await animateRange(s.start, s.end, s.dur, (v)=>{
+          const iv = Math.round(v);
+          bar.style.width = iv + "%";
+          pct.textContent = iv + "%";
+
+          const remaining = Math.max(0, steps.length - 1 - k);
+          eta.textContent = remaining === 0
+            ? "Finalizing…"
+            : `Processing… (${remaining} step${remaining>1?"s":""} left)`;
+        });
+
+        setStepState(s.box, "done");
+        setTag(s.tag, s.labelDone, "ok");
+      }
+
+      // ✅ هنا نحفظ
+      eta.textContent = "Saving results…";
+      await saveAnalysis();
+
+      // ثم نكمل الفلو الطبيعي
+      eta.textContent = "Completed ✅";
+      await new Promise(r=>setTimeout(r, 280));
+      go("dashboard.html");
+    }
+
+    function go(url){
+      const page = document.getElementById("page");
+      page.classList.add("page-leave");
+      setTimeout(()=> window.location.href = url, 220);
+    }
+
+    function cancelToAssessment(){
+      go("assessment.html");
+    }
+
+    run();
+  </script>
+</body>
+</html>

@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NeuroGift | Login</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','sans-serif'] } } } }
+  </script>
+
+  <style>
+    body{
+      background-image:url('bg.png');
+      background-size:cover;
+      background-position:center;
+      background-repeat:no-repeat;
+      background-attachment:fixed;
+    }
+    .overlay{
+      background:
+        radial-gradient(circle at 50% 25%, rgba(18,48,92,0.35), rgba(7,10,18,0.92) 65%),
+        linear-gradient(to bottom, rgba(10,14,23,0.45), rgba(10,14,23,0.92));
+    }
+
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover,
+    input:-webkit-autofill:focus{
+      -webkit-text-fill-color:#fff;
+      -webkit-box-shadow: 0 0 0px 1000px rgba(0,0,0,0.18) inset;
+      transition: background-color 9999s ease-in-out 0s;
+    }
+
+    .fit-vh{ transform-origin: top center; }
+    @media (max-height: 820px){ .fit-vh{ transform: scale(.95); } }
+    @media (max-height: 760px){ .fit-vh{ transform: scale(.90); } }
+    @media (max-height: 700px){ .fit-vh{ transform: scale(.85); } }
+    @media (max-height: 640px){ .fit-vh{ transform: scale(.80); } }
+
+    .page-enter{opacity:1; transform: translateY(0); transition: 320ms ease;}
+    .page-leave{opacity:0; transform: translateY(10px);}
+
+    .modal-backdrop{
+      background: radial-gradient(circle at 50% 30%, rgba(71,197,225,.18), rgba(10,14,23,.75) 70%);
+    }
+
+    /* small helper */
+    .disabled-ui{ pointer-events:none; filter: blur(1px); opacity:.25; }
+  </style>
+</head>
+
+<body class="font-sans text-white h-screen overflow-hidden relative">
+  <div class="overlay absolute inset-0 z-0"></div>
+
+  <main class="relative z-10 h-screen flex items-center justify-center px-6">
+    <div id="page" class="page-enter w-full">
+      <div id="uiWrap" class="fit-vh w-full max-w-2xl mx-auto flex flex-col items-center">
+
+        <img src="logo.png" alt="NeuroGift Logo"
+          class="w-24 h-24 sm:w-28 sm:h-28 object-contain drop-shadow-[0_0_26px_rgba(120,200,255,0.45)] mb-4" />
+
+        <h1 class="text-4xl sm:text-5xl font-bold tracking-tight mb-6 drop-shadow-[0_10px_30px_rgba(0,0,0,0.35)]">
+          Welcome Back <span class="inline-block translate-y-0.5">👋</span>
+        </h1>
+
+        <div id="msg" class="hidden w-full mb-3 text-center text-sm"></div>
+
+        <form class="w-full space-y-5" onsubmit="login(event)">
+          <input id="loginEmail" type="email" placeholder="Email"
+            class="w-full h-14 px-6 rounded-2xl bg-white/5 backdrop-blur-md border border-white/30
+                   text-white placeholder-white/70 outline-none focus:border-sky-300/70 focus:ring-2
+                   focus:ring-sky-300/15 transition" />
+
+          <div class="space-y-2">
+            <input id="loginPassword" type="password" placeholder="Password"
+              class="w-full h-14 px-6 rounded-2xl bg-white/5 backdrop-blur-md border border-white/30
+                     text-white placeholder-white/70 outline-none focus:border-sky-300/70 focus:ring-2
+                     focus:ring-sky-300/15 transition" />
+            <div class="text-right">
+              <a href="#" class="text-sky-300/90 hover:text-sky-200 text-sm transition">Forgot Password?</a>
+            </div>
+          </div>
+
+          <button id="loginBtn" type="submit"
+            class="w-full h-14 rounded-2xl bg-[#6D1FD3] hover:bg-[#7B2BE6]
+                   text-white text-xl font-semibold shadow-[0_10px_30px_rgba(109,31,211,0.25)]
+                   active:scale-[0.99] transition">
+            Sign in
+          </button>
+
+          <div class="flex items-center gap-5 pt-1">
+            <div class="h-px flex-1 bg-white/35"></div>
+            <div class="text-white/35 text-sm">Or</div>
+            <div class="h-px flex-1 bg-white/35"></div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <button type="button"
+              class="h-14 rounded-2xl bg-white/5 backdrop-blur-md border border-white/30
+                     hover:border-white/45 flex items-center justify-center gap-3 transition">
+              <span class="text-white/90 font-medium">Sign in with Google</span>
+            </button>
+
+            <button type="button"
+              class="h-14 rounded-2xl bg-white/5 backdrop-blur-md border border-white/30
+                     hover:border-white/45 flex items-center justify-center gap-3 transition">
+              <span class="text-white/90 font-medium">Sign in with Facebook</span>
+            </button>
+          </div>
+
+          <p class="text-center text-white/70 pt-2">
+            Don’t you have an account?
+            <button type="button" onclick="go('signup.html')"
+              class="text-sky-300 hover:text-sky-200 font-semibold transition">
+              Sign up
+            </button>
+          </p>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <!-- ✅ New user modal (if hasAnalysis=0) -->
+  <div id="newUserModal" class="hidden fixed inset-0 z-50">
+    <div class="absolute inset-0 modal-backdrop"></div>
+    <div class="relative h-full w-full flex items-center justify-center px-6">
+      <div class="w-full max-w-lg rounded-3xl bg-white/5 border border-white/15 backdrop-blur-xl p-7">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-10 h-10 rounded-2xl bg-sky-400/10 border border-sky-300/20 flex items-center justify-center">
+            <span class="text-sky-200 text-lg">🧠</span>
+          </div>
+          <h3 class="text-xl font-bold">No analysis yet</h3>
+        </div>
+
+        <p class="text-white/70 leading-relaxed">
+          To personalize your learning experience, we need a quick session to identify your intelligence pattern.
+          <br/>
+          It’s short — and for the demo, EEG signals are simulated.
+        </p>
+
+        <div class="mt-6 flex flex-col sm:flex-row gap-3">
+          <button onclick="startFirstAnalysis()"
+            class="w-full h-12 rounded-2xl bg-[#6D1FD3] hover:bg-[#7B2BE6] font-semibold transition">
+            Start now
+          </button>
+          <button onclick="goHome()"
+            class="w-full h-12 rounded-2xl bg-white/5 border border-white/15 hover:bg-white/10 transition">
+            Later
+          </button>
+        </div>
+
+        <p class="mt-4 text-[11px] text-white/45">
+          You can view your results later from the Home page icon.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function go(url){
+      const page = document.getElementById('page');
+      page.classList.add('page-leave');
+      setTimeout(()=> window.location.href = url, 220);
+    }
+
+    function setMsg(text, ok=false){
+      const el = document.getElementById('msg');
+      el.className = ok
+        ? "w-full mb-3 text-center text-sm text-emerald-200"
+        : "w-full mb-3 text-center text-sm text-rose-200";
+      el.textContent = text;
+      el.classList.remove('hidden');
+    }
+
+    function openNewUserModal(){
+      document.getElementById("newUserModal").classList.remove("hidden");
+      // lock UI behind modal (prevents weird re-clicks)
+      document.getElementById("uiWrap").classList.add("disabled-ui");
+    }
+
+    function startFirstAnalysis(){
+      window.location.href = "device-connect.html";
+    }
+
+    function goHome(){
+      window.location.href = "courses.html";
+    }
+
+    async function login(e){
+      e.preventDefault();
+
+      const email = document.getElementById("loginEmail").value.trim();
+      const password = document.getElementById("loginPassword").value;
+
+      if(!email || !password){
+        setMsg("Please enter email and password.");
+        return;
+      }
+
+      const btn = document.getElementById("loginBtn");
+      btn.disabled = true;
+      btn.textContent = "Signing in...";
+
+      try{
+        const res = await fetch("./api/login.php", {
+          method: "POST",
+          headers: { "Content-Type":"application/json" },
+          body: JSON.stringify({ email, password })
+        });
+
+        const data = await res.json();
+
+        if(!data.ok){
+          setMsg(data.error || "Login failed.");
+          return;
+        }
+
+        // store minimal user info (optional UI)
+        if(data.user?.fullName) sessionStorage.setItem("ng_user_name", data.user.fullName);
+        if(data.user?.id != null) sessionStorage.setItem("ng_user_id", String(data.user.id));
+
+        const hasAnalysis = Number(data.user?.hasAnalysis ?? 0);
+
+        if(hasAnalysis === 0){
+          openNewUserModal();
+          return;
+        }
+
+        setMsg("✅ Logged in! Redirecting...", true);
+        setTimeout(goHome, 250);
+
+      }catch(err){
+        setMsg("Network error. Check Apache/PHP.");
+      }finally{
+        btn.disabled = false;
+        btn.textContent = "Sign in";
+      }
+    }
+  </script>
+</body>
+</html>

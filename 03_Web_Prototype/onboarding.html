@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NeuroGift | Dashboard</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: { extend: { fontFamily:{ sans:['Inter','sans-serif'] } } }
+    }
+  </script>
+
+  <style>
+    :root{
+      --bg1:#050A16;
+      --bg2:#020614;
+      --glass: rgba(8,14,30,0.62);
+      --border: rgba(255,255,255,0.10);
+      --border2: rgba(255,255,255,0.14);
+    }
+
+    body{
+      min-height:100vh;
+      margin:0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      color:#fff;
+      background:
+        radial-gradient(1200px 700px at 30% 12%, rgba(75,233,255,0.16), transparent 60%),
+        radial-gradient(1200px 700px at 78% 22%, rgba(213,166,255,0.12), transparent 60%),
+        radial-gradient(900px 600px at 50% 88%, rgba(75,233,255,0.08), transparent 60%),
+        linear-gradient(180deg, var(--bg1) 0%, #040815 35%, var(--bg2) 100%);
+      background-attachment: fixed;
+    }
+
+    .chip{
+      border-radius: 999px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--border2);
+      padding: 8px 12px;
+    }
+
+    .wrap{
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 22px 24px 32px;
+    }
+    @media (min-width: 1536px){
+      .wrap{ max-width: 1460px; }
+    }
+    @media (max-width: 640px){
+      .wrap{ padding: 16px 14px 22px; }
+    }
+
+    .shell{
+      border-radius: 46px;
+      background: var(--glass);
+      border: 1px solid var(--border);
+      box-shadow:
+        0 60px 140px rgba(0,0,0,0.65),
+        inset 0 0 0 1px rgba(255,255,255,0.06);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      overflow: hidden;
+      position: relative;
+    }
+    .shell::before{
+      content:"";
+      position:absolute; inset:-2px;
+      pointer-events:none;
+      background:
+        radial-gradient(1200px 520px at 50% -10%, rgba(255,255,255,0.18), transparent 62%),
+        radial-gradient(900px 450px at 20% 0%, rgba(75,233,255,0.12), transparent 60%),
+        radial-gradient(900px 450px at 80% 0%, rgba(213,166,255,0.10), transparent 60%);
+      opacity:0.85;
+    }
+
+    .shell-inner{
+      padding: 34px 36px 30px;
+      position: relative;
+    }
+    @media (max-width: 768px){
+      .shell-inner{ padding: 22px 18px 20px; }
+    }
+
+    .wave-frame{
+      border-radius: 18px;
+      border: 2px solid rgba(75,233,255,0.55);
+      background: rgba(0,0,0,0.18);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06);
+      overflow:hidden;
+      position: relative;
+    }
+    .row-sep{ height:1px; background: rgba(255,255,255,0.10); }
+    .wave-row{
+      display:grid;
+      grid-template-columns: 160px 1fr;
+      gap: 18px;
+      align-items:center;
+      padding: 14px 16px;
+    }
+    @media (max-width: 640px){
+      .wave-row{ grid-template-columns: 1fr; gap: 10px; }
+    }
+
+    .wave-box{
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(0,0,0,0.22);
+      overflow: hidden;
+      position: relative;
+      height: 78px;
+      padding: 8px;
+    }
+    .wave-box svg{
+      width: 100%;
+      height: 100%;
+      display:block;
+    }
+    .wave-box::after{
+      content:"";
+      position:absolute; inset:0;
+      pointer-events:none;
+      background: radial-gradient(700px 180px at 25% 0%, rgba(75,233,255,0.10), transparent 60%);
+      opacity:.9;
+    }
+
+    .tile{
+      border-radius: 16px;
+      background: rgba(5,10,22,0.22);
+      border: 1px solid rgba(75,233,255,0.30);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06);
+      min-height: 108px;
+    }
+    .tile .label{ letter-spacing: 0.03em; }
+
+    .chart-panel{
+      border-radius: 18px;
+      background: rgba(5,10,22,0.22);
+      border: 1px solid rgba(75,233,255,0.30);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06);
+      overflow:hidden;
+    }
+
+    .chart-grid{
+      position: relative;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(0,0,0,0.18);
+      height: 240px;
+      padding: 14px 14px 28px 58px;
+      overflow:hidden;
+    }
+    .chart-grid::before{
+      content:"";
+      position:absolute; inset:0;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.06) 1px, transparent 1px);
+      background-size: 100% 40px;
+      opacity:0.55;
+      pointer-events:none;
+    }
+    .axis-title{
+      position:absolute;
+      left: 14px;
+      top: 14px;
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      color: rgba(255,255,255,0.40);
+    }
+    .y-axis{
+      position:absolute;
+      left: 14px;
+      top: 44px;
+      bottom: 36px;
+      width: 36px;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      pointer-events:none;
+      color: rgba(255,255,255,0.35);
+      font-size: 10px;
+      z-index: 2;
+    }
+    .bars{
+      position:absolute;
+      left: 58px;
+      right: 14px;
+      bottom: 36px;
+      top: 14px;
+      display:flex;
+      align-items:flex-end;
+      justify-content: space-around;
+      gap: 14px;
+      z-index: 2;
+    }
+    .bar{
+      width: 18%;
+      max-width: 68px;
+      height: 100%;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.05);
+      position: relative;
+      overflow:hidden;
+    }
+    .bar > .fill{
+      position:absolute;
+      left:0; right:0; bottom:0;
+      height: 40%;
+      border-radius: 10px;
+    }
+    .fill.c1{ background: linear-gradient(180deg, rgba(75,233,255,0.92), rgba(75,233,255,0.12)); }
+    .fill.c2{ background: linear-gradient(180deg, rgba(167,139,250,0.92), rgba(167,139,250,0.12)); }
+    .fill.c3{ background: linear-gradient(180deg, rgba(139,92,246,0.92), rgba(139,92,246,0.12)); }
+    .fill.c4{ background: linear-gradient(180deg, rgba(213,166,255,0.92), rgba(213,166,255,0.12)); }
+
+    .x-labels{
+      position:absolute;
+      left: 58px;
+      right: 14px;
+      bottom: 10px;
+      display:flex;
+      justify-content: space-around;
+      font-size: 10px;
+      color: rgba(255,255,255,0.40);
+      letter-spacing: 0.08em;
+      z-index: 2;
+    }
+
+    .glow-spot{
+      position:absolute;
+      width: 190px; height: 190px;
+      border-radius: 999px;
+      filter: blur(18px);
+      mix-blend-mode: screen;
+      pointer-events:none;
+      opacity: 0.85;
+      background: radial-gradient(circle,
+        rgba(255,255,255,0.65) 0%,
+        rgba(75,233,255,0.55) 30%,
+        rgba(213,166,255,0.35) 56%,
+        rgba(75,233,255,0.00) 72%
+      );
+      animation: pulse 1.9s ease-in-out infinite;
+      transform: translate(-50%,-50%);
+    }
+    @keyframes pulse{
+      0%,100% { transform: translate(-50%,-50%) scale(0.95); opacity: 0.62; }
+      50%     { transform: translate(-50%,-50%) scale(1.05); opacity: 0.95; }
+    }
+
+    .page-enter{opacity:1; transform: translateY(0); transition: 320ms ease;}
+    .page-leave{opacity:0; transform: translateY(10px);}
+
+    .btn{
+      height: 44px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.15);
+      transition: 160ms ease;
+      font-weight: 700;
+      color: white;
+    }
+    .btn:hover{ background: rgba(255,255,255,0.10); }
+
+    .logo-img{
+      width: 34px; height: 34px;
+      border-radius: 12px;
+      object-fit: contain;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.14);
+      padding: 6px;
+    }
+
+    /* Styles preserved from your layout */
+    .sm\:flex-1.text-center.sm\:text-left {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      margin-top: 30px;
+      margin-left: 10px;
+    }
+
+    h1.text-3xl.sm\:text-4xl.xl\:text-\[42px\].font-extrabold.italic.tracking-tight.text-white\/90.leading-tight {
+      text-align: center;
+      font-size: 56px;
+    }
+
+    p.text-sm.sm\:text-base.text-white\/55.mt-1 {
+      margin-top: 16px;
+      text-align: center;
+      font-size: 20px;
+    }
+
+    img#brainImg {
+      filter: drop-shadow(rgba(255, 255, 255, 0.5) 0px 0px 40px);
+      background-color: transparent;
+    }
+
+    div#spot {
+      background: radial-gradient(circle, rgba(255,192,255,0.65) 0%, rgba(160,32,240,0.55) 30%, rgba(128,0,128,0.35) 56%, rgba(128,0,128,0.00) 72%);
+    }
+
+    .text-\[11px\].text-white\/45.italic.leading-snug { font-size: 14px; }
+    .font-bold.italic.text-white\/85.text-lg { font-size: 26px; }
+    .text-\[10\.5px\].text-white\/55.italic.mt-1.leading-snug { font-size: 14px; text-align: center; }
+    .label.font-extrabold.italic.text-white\/90.text-sm { font-size: 22px; text-align: center; }
+    .text-xl.font-extrabold.text-white\/90.text-right { text-align: center; }
+    span#focusHz { font-size: 24px; }
+    span.text-\[10px\].font-semibold.text-white\/60 { font-size: 14px; }
+    .font-bold.italic.text-white\/85 { font-size: 30px; }
+    .text-\[11px\].text-white\/50.italic.mt-1 { font-size: 20px; }
+    .x-labels > div { font-size: 14px; }
+    .axis-title { font-size: 14px; }
+    .mt-6.text-center.text-\[11px\].italic.text-white\/45 { font-size: 14px; }
+    .text-xs.text-white\/55.leading-relaxed { font-size: 16px; }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header class="flex items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <img id="logoImg" src="logo.svg" alt="NeuroGift Logo" class="logo-img"
+             onerror="this.onerror=null; this.src='logo.png';" />
+        <div class="leading-tight">
+          <div class="font-extrabold tracking-wide">NEUROGIFT</div>
+          <div class="text-xs text-white/55 -mt-0.5">Dashboard</div>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <div class="chip flex items-center gap-2 cursor-pointer transition hover:bg-white/10" onclick="window.location.href='profile.html'">
+          <div class="w-8 h-8 rounded-xl bg-white/10 border border-white/15 flex items-center justify-center font-bold" id="avatar">U</div>
+          <div class="leading-tight">
+            <div class="text-sm font-semibold" id="userName">User</div>
+            <div class="text-[11px] text-white/45" id="userEmail">—</div>
+          </div>
+        </div>
+
+        <button id="backBtn" class="hidden btn px-4 text-sm">Back</button>
+        <button id="logoutBtn" class="btn px-4 text-sm">Logout</button>
+      </div>
+    </header>
+
+    <main class="mt-6">
+      <div id="page" class="page-enter">
+        <div class="shell">
+          <div class="shell-inner">
+
+            <div class="grid grid-cols-1 lg:grid-cols-[420px_minmax(0,1fr)] gap-8 xl:gap-12">
+              <aside class="relative">
+                <div class="flex items-center justify-center">
+                  <div class="relative">
+                    <img
+                      id="brainImg"
+                      src="brain-front.png"
+                      onerror="this.onerror=null; this.src='brain.png';"
+                      alt="Brain"
+                      class="w-[300px] xl:w-[330px] object-contain"
+                    />
+                    <div id="spot" class="glow-spot"></div>
+                  </div>
+                </div>
+
+                <div class="mt-6 text-center px-6">
+                  <div class="text-xs text-white/55 leading-relaxed">
+                    This visualization highlights the most active areas of your brain during the session.
+                    <br><br>
+                    Higher activity indicates stronger engagement and cognitive response.
+                  </div>
+                </div>
+              </aside>
+
+              <section class="relative">
+                <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                  <div class="sm:flex-1 text-center sm:text-left">
+                    <h1 class="text-3xl sm:text-4xl xl:text-[42px] font-extrabold italic tracking-tight text-white/90 leading-tight">
+                      Brain Activity Dashboard
+                    </h1>
+                    <p class="text-sm sm:text-base text-white/55 mt-1">
+                      Real-time analysis of your mental state based on EEG signals
+                    </p>
+                  </div>
+
+                  <div class="flex justify-center sm:justify-end pt-1">
+                    <button id="homeBtn" class="text-sm font-semibold text-sky-200/80 hover:text-sky-100 transition">
+                      Home
+                    </button>
+                  </div>
+                </div>
+
+                <div class="h-px bg-white/12 my-6"></div>
+
+                <div class="wave-frame">
+                  <div class="wave-row">
+                    <div>
+                      <div class="font-bold italic text-white/85 text-lg">Gamma</div>
+                      <div class="text-[11px] text-white/45 italic leading-snug">
+                        High-level focus and cognitive processing
+                      </div>
+                    </div>
+                    <div class="wave-box">
+                      <svg viewBox="0 0 420 62" preserveAspectRatio="none">
+                        <path id="pGamma" d="" fill="rgba(71,197,225,0.52)"></path>
+                        <path id="pGamma2" d="" fill="rgba(71,197,225,0.16)"></path>
+                        <g id="dGamma"></g>
+                      </svg>
+                    </div>
+                  </div>
+                  <div class="row-sep"></div>
+
+                  <div class="wave-row">
+                    <div>
+                      <div class="font-bold italic text-white/85 text-lg">Beta</div>
+                      <div class="text-[11px] text-white/45 italic leading-snug">
+                        Active thinking and problem solving
+                      </div>
+                    </div>
+                    <div class="wave-box">
+                      <svg viewBox="0 0 420 62" preserveAspectRatio="none">
+                        <path id="pBeta" d="" fill="rgba(167,139,250,0.52)"></path>
+                        <path id="pBeta2" d="" fill="rgba(167,139,250,0.16)"></path>
+                        <g id="dBeta"></g>
+                      </svg>
+                    </div>
+                  </div>
+                  <div class="row-sep"></div>
+
+                  <div class="wave-row">
+                    <div>
+                      <div class="font-bold italic text-white/85 text-lg">Theta</div>
+                      <div class="text-[11px] text-white/45 italic.leading-snug">
+                        Relaxed awareness and creativity
+                      </div>
+                    </div>
+                    <div class="wave-box">
+                      <svg viewBox="0 0 420 62" preserveAspectRatio="none">
+                        <path id="pTheta" d="" fill="rgba(139,92,246,0.45)"></path>
+                        <path id="pTheta2" d="" fill="rgba(139,92,246,0.14)"></path>
+                        <g id="dTheta"></g>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div class="tile p-4 flex flex-col justify-between">
+                    <div>
+                      <div class="label font-extrabold italic text-white/90 text-sm">FOCUS</div>
+                      <div class="text-[10.5px] text-white/55 italic mt-1 leading-snug">
+                        Maintain attention during tasks
+                      </div>
+                    </div>
+                    <div class="text-xl font-extrabold text-white/90 text-right">
+                      <span id="focusHz">—</span><span class="text-[10px] font-semibold text-white/60">Hz</span>
+                    </div>
+                  </div>
+
+                  <div class="tile p-4 flex flex-col justify-between">
+                    <div>
+                      <div class="label font-extrabold italic text-white/90 text-sm">MODE</div>
+                      <div class="text-[10.5px] text-white/55 italic mt-1 leading-snug">
+                        Productivity level
+                      </div>
+                    </div>
+                    <div class="text-xl font-extrabold text-white/90 text-right">
+                      <span id="modeHz">—</span><span class="text-[10px] font-semibold text-white/60">Hz</span>
+                    </div>
+                  </div>
+
+                  <div class="tile p-4 flex flex-col justify-between">
+                    <div>
+                      <div class="label font-extrabold italic text-white/90 text-sm">LEISURE</div>
+                      <div class="text-[10.5px] text-white/55 italic mt-1 leading-snug">
+                        Low-stress state
+                      </div>
+                    </div>
+                    <div class="text-xl font-extrabold text-white/90 text-right">
+                      <span id="leisureHz">—</span><span class="text-[10px] font-semibold text-white/60">Hz</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="mt-4 chart-panel p-5">
+                  <div class="text-center">
+                    <div class="font-bold italic text-white/85">Time Distribution</div>
+                    <div class="text-[11px] text-white/50 italic mt-1">
+                      How your mental states were distributed throughout the session
+                    </div>
+                  </div>
+
+                  <div class="mt-4 chart-grid">
+                    <div class="axis-title">HOUR</div>
+                    <div class="y-axis">
+                      <div>7</div><div>6</div><div>5</div><div>4</div><div>3</div><div>2</div><div>1</div>
+                    </div>
+
+                    <div class="bars">
+                      <div class="bar"><div id="barFocusV" class="fill c1" style="height:40%"></div></div>
+                      <div class="bar"><div id="barWorkV" class="fill c2" style="height:30%"></div></div>
+                      <div class="bar"><div id="barLeisureV" class="fill c3" style="height:20%"></div></div>
+                      <div class="bar"><div id="barSleepV" class="fill c4" style="height:10%"></div></div>
+                    </div>
+
+                    <div class="x-labels">
+                      <div>FOCUS</div><div>WORK</div><div>LEISURE</div><div>SLEEP</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="mt-6 text-center text-[11px] italic text-white/45">
+                  Powered by EEG-based brain signal analysis
+                </div>
+
+                <div class="mt-4">
+                  <button id="continueBtn" class="btn w-full">
+                    Continue to Courses
+                  </button>
+                </div>
+              </section>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    function go(url){
+      const page = document.getElementById("page");
+      page.classList.add("page-leave");
+      setTimeout(()=> window.location.href = url, 220);
+    }
+    function safeJsonParse(s){ try { return JSON.parse(s); } catch(e){ return null; } }
+
+    const POS = {
+      visual_spatial: { x: 50, y: 28 },
+      logical:        { x: 52, y: 34 },
+      verbal:         { x: 50, y: 44 },
+      focus:          { x: 50, y: 30 }
+    };
+
+    function placeGlow(label){
+      const img = document.getElementById("brainImg");
+      const spot = document.getElementById("spot");
+      const pos = POS[label] || POS.visual_spatial;
+      const w = img.clientWidth;
+      const h = img.clientHeight;
+      spot.style.left = (pos.x/100) * w + "px";
+      spot.style.top  = (pos.y/100) * h + "px";
+    }
+
+    function makeAreaPath(seed, intensity=1, t=0){
+      const W = 420, H = 62;
+      const base = 36;
+      const amp = 10 * intensity;
+
+      let d = `M 0 ${H} L 0 ${base}`;
+      for(let x=0; x<=W; x+=12){
+        const y = base
+          + Math.sin((x*0.018) + seed + t*1.2) * amp
+          + Math.sin((x*0.055) + seed*1.7 + t*1.8) * (amp*0.45)
+          + Math.sin((x*0.095) + seed*2.1 + t*2.3) * (amp*0.18);
+
+        const yy = Math.max(12, Math.min(50, y));
+        d += ` L ${x} ${yy.toFixed(2)}`;
+      }
+      d += ` L ${W} ${H} Z`;
+      return d;
+    }
+
+    function makeAreaPath2(seed, intensity=1, t=0){
+      const W = 420, H = 62;
+      const base = 40;
+      const amp = 7 * intensity;
+
+      let d = `M 0 ${H} L 0 ${base}`;
+      for(let x=0; x<=W; x+=12){
+        const y = base
+          + Math.sin((x*0.022) + seed + t*1.0) * amp
+          + Math.sin((x*0.060) + seed*1.9 + t*1.6) * (amp*0.35);
+
+        const yy = Math.max(14, Math.min(52, y));
+        d += ` L ${x} ${yy.toFixed(2)}`;
+      }
+      d += ` L ${W} ${H} Z`;
+      return d;
+    }
+
+    function waveYAt(x, seed, intensity, t){
+      const base = 36;
+      const amp = 10 * intensity;
+      const y = base
+        + Math.sin((x*0.018) + seed + t*1.2) * amp
+        + Math.sin((x*0.055) + seed*1.7 + t*1.8) * (amp*0.45)
+        + Math.sin((x*0.095) + seed*2.1 + t*2.3) * (amp*0.18);
+      return Math.max(12, Math.min(50, y));
+    }
+
+    function renderDots(groupId, seed, intensity, t, color){
+      const g = document.getElementById(groupId);
+      if(!g) return;
+      const xs = [90, 170, 260, 345, 410];
+      let html = "";
+      for(const x of xs){
+        const y = waveYAt(x, seed, intensity, t);
+        html += `<circle cx="${x}" cy="${y.toFixed(2)}" r="3" fill="${color}" opacity="0.95" />`;
+        html += `<circle cx="${x}" cy="${y.toFixed(2)}" r="7" fill="${color}" opacity="0.10" />`;
+      }
+      g.innerHTML = html;
+    }
+
+    function setBars(values){
+      const clamp = (v)=> Math.max(0, Math.min(1, v));
+      const toPct = (v)=> Math.round(clamp(v)*100);
+
+      const f = toPct(values[0] ?? 0.4);
+      const w = toPct(values[1] ?? 0.3);
+      const l = toPct(values[2] ?? 0.2);
+      const s = toPct(values[3] ?? 0.1);
+
+      const setH = (id, pct)=>{
+        const el = document.getElementById(id);
+        if(el) el.style.height = pct + "%";
+      };
+
+      setH("barFocusV", f);
+      setH("barWorkV", w);
+      setH("barLeisureV", l);
+      setH("barSleepV", s);
+    }
+
+    async function loadMe(){
+      try{
+        const res = await fetch("./api/me.php", { method:"GET" });
+        if(!res.ok) return null;
+        const data = await res.json();
+        if(!data.ok) return null;
+        return data.user || null;
+      } catch(e){
+        return null;
+      }
+    }
+
+    function setUserHeader(me){
+      const name = me?.fullName || "User";
+      const email = me?.email || "—";
+      document.getElementById("userName").textContent = name;
+      document.getElementById("userEmail").textContent = email;
+      const first = (name || "U").trim().charAt(0).toUpperCase();
+      document.getElementById("avatar").textContent = first || "U";
+    }
+
+    function applyResult(result){
+      const label = result?.label || "visual_spatial";
+      placeGlow(label);
+
+      const proba = result?.proba || { visual_spatial: 0.7, logical: 0.2, verbal: 0.1 };
+      const vs = Number(proba.visual_spatial ?? 0.7);
+      const lg = Number(proba.logical ?? 0.2);
+      const vb = Number(proba.verbal ?? 0.1);
+
+      const focusHz  = Math.round(18 + vs*18);
+      const modeHz   = Math.round( 8 + lg*12);
+      const leisureHz= Math.round( 2 + vb* 6);
+
+      document.getElementById("focusHz").textContent = focusHz;
+      document.getElementById("modeHz").textContent = modeHz;
+      document.getElementById("leisureHz").textContent = leisureHz;
+
+      const focus = Math.max(0.15, Math.min(0.65, 0.35 + vs*0.35));
+      const work  = Math.max(0.15, Math.min(0.55, 0.25 + lg*0.30));
+      let leisure = Math.max(0.05, Math.min(0.35, 0.15 + vb*0.25));
+      let sleep   = 1 - (focus + work + leisure);
+
+      if(sleep < 0.05){
+        sleep = 0.08;
+        leisure = Math.max(0.05, 1 - (focus + work + sleep));
+      }
+
+      const sum2 = focus + work + leisure + sleep;
+      setBars([focus/sum2, work/sum2, leisure/sum2, sleep/sum2]);
+
+      window.__wave = {
+        gammaI: 0.75 + vs * 0.60,
+        betaI:  0.70 + lg * 0.60,
+        thetaI: 0.70 + vb * 0.60
+      };
+    }
+
+    let __t = 0;
+    function animateWaves(){
+      const w = window.__wave || {gammaI:1,betaI:1,thetaI:1};
+      __t += 0.02;
+
+      const pg  = document.getElementById("pGamma");
+      const pg2 = document.getElementById("pGamma2");
+      const pb  = document.getElementById("pBeta");
+      const pb2 = document.getElementById("pBeta2");
+      const pt  = document.getElementById("pTheta");
+      const pt2 = document.getElementById("pTheta2");
+
+      if(pg)  pg.setAttribute("d",  makeAreaPath(1.2, w.gammaI, __t));
+      if(pg2) pg2.setAttribute("d", makeAreaPath2(1.9, w.gammaI, __t+0.6));
+
+      if(pb)  pb.setAttribute("d",  makeAreaPath(2.4, w.betaI, __t+0.2));
+      if(pb2) pb2.setAttribute("d", makeAreaPath2(2.9, w.betaI, __t+0.9));
+
+      if(pt)  pt.setAttribute("d",  makeAreaPath(3.6, w.thetaI, __t+0.35));
+      if(pt2) pt2.setAttribute("d", makeAreaPath2(4.2, w.thetaI, __t+1.1));
+
+      renderDots("dGamma", 1.2, w.gammaI, __t, "rgba(75,233,255,0.95)");
+      renderDots("dBeta",  2.4, w.betaI,  __t+0.2, "rgba(167,139,250,0.95)");
+      renderDots("dTheta", 3.6, w.thetaI, __t+0.35, "rgba(139,92,246,0.95)");
+
+      requestAnimationFrame(animateWaves);
+    }
+
+    document.getElementById("homeBtn").addEventListener("click", ()=> go("courses.html"));
+    document.getElementById("continueBtn").addEventListener("click", ()=> go("courses.html"));
+
+    document.getElementById("logoutBtn").addEventListener("click", async ()=>{
+      try{ await fetch("./api/logout.php", { method:"POST" }); }catch(e){}
+      go("login.html");
+    });
+
+    document.getElementById("backBtn").addEventListener("click", ()=> go("courses.html"));
+
+    async function init(){
+      const fromAnalysis = sessionStorage.getItem("ng_from_analysis") === "1";
+      if(fromAnalysis) document.getElementById("backBtn").classList.remove("hidden");
+
+      const img = document.getElementById("brainImg");
+      if(img.complete) placeGlow("visual_spatial");
+      else img.addEventListener("load", ()=>placeGlow("visual_spatial"));
+
+      window.addEventListener("resize", ()=>{
+        const r = window.__lastLabel || "visual_spatial";
+        placeGlow(r);
+      });
+
+      const me = await loadMe();
+      if(me) setUserHeader(me);
+
+      let result = null;
+      const raw = sessionStorage.getItem("ng_result");
+      if(raw) result = safeJsonParse(raw);
+      else if(me?.lastResult) result = (typeof me.lastResult === "string") ? safeJsonParse(me.lastResult) : me.lastResult;
+
+      if(!result){
+        result = { label:"visual_spatial", label_display:"Visual-Spatial Intelligence", proba:{ visual_spatial:0.7, logical:0.2, verbal:0.1 } };
+      }
+
+      window.__lastLabel = result.label || "visual_spatial";
+      applyResult(result);
+      animateWaves();
+    }
+
+    init();
+  </script>
+</body>
+</html>

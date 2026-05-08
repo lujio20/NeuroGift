@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NeuroGift | Splash</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,600;0,800;1,400;1,700&family=Poppins:ital,wght@0,600;0,800;1,600;1,800&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            title: ['Poppins', 'Inter', 'sans-serif'],
+          },
+          animation: { float: 'float 6s ease-in-out infinite' },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0)' },
+              '50%': { transform: 'translateY(-10px)' },
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body{
+      background-image:url('bg.png');
+      background-size:cover;
+      background-position:center;
+      background-repeat:no-repeat;
+      background-attachment:fixed;
+    }
+
+    .overlay{
+      background:
+        radial-gradient(circle at 50% 35%, rgba(18,48,92,0.35), rgba(7,10,18,0.92) 65%),
+        linear-gradient(to bottom, rgba(10,14,23,0.35), rgba(10,14,23,0.92));
+    }
+
+    .fade-in-up{
+      opacity:0;
+      animation: fadeInUp 0.9s ease-out forwards;
+    }
+    @keyframes fadeInUp{
+      from{ opacity:0; transform: translateY(22px); }
+      to  { opacity:1; transform: translateY(0); }
+    }
+    .delay-150{ animation-delay:.15s; }
+    .delay-300{ animation-delay:.30s; }
+    .delay-500{ animation-delay:.50s; }
+
+    .figma-gradient-text{
+      background: linear-gradient(
+        90deg,
+        #F5F5F5 0%,
+        #47C5E1 25%,
+        #D5A6FF 45%,
+        #4BE9FF 70%,
+        #D9F2F8 100%
+      );
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .loader{
+      width: 46px;
+      height: 46px;
+      border-radius: 999px;
+      border: 2px solid rgba(255,255,255,0.18);
+      border-top-color: rgba(75,233,255,0.85);
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin{
+      to{ transform: rotate(360deg); }
+    }
+  </style>
+</head>
+
+<body class="text-white h-screen overflow-hidden relative font-sans">
+  <div class="overlay absolute inset-0 z-0"></div>
+
+  <main class="relative z-10 flex flex-col items-center justify-center h-full w-full px-6 text-center">
+    <div class="fade-in-up delay-150 mb-6">
+      <div class="animate-float flex items-center justify-center">
+        <img
+          src="logo.png"
+          alt="NeuroGift Logo"
+          class="w-56 h-56 sm:w-60 sm:h-60 md:w-64 md:h-64 object-contain
+                 drop-shadow-[0_0_28px_rgba(120,200,255,0.38)]"
+        />
+      </div>
+    </div>
+
+    <h1 class="fade-in-up delay-300 font-title font-extrabold italic
+               text-6xl sm:text-7xl md:text-7xl tracking-tight mb-2
+               drop-shadow-[0_0_18px_rgba(120,200,255,0.25)]">
+      <span class="figma-gradient-text">NeuroGift</span>
+    </h1>
+
+    <p class="fade-in-up delay-300 italic
+              text-sm sm:text-base md:text-lg
+              text-[#B8C6D9]
+              tracking-wide mb-8
+              drop-shadow-[0_8px_25px_rgba(0,0,0,0.35)]">
+      powered by EEG &amp; AI&nbsp; Technology
+    </p>
+
+    <div class="fade-in-up delay-500 flex flex-col items-center gap-3">
+      <div class="loader"></div>
+      <div id="statusTxt" class="text-white/70 text-sm">
+        Checking your session…
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const statusTxt = document.getElementById("statusTxt");
+
+    function go(url){
+      // انتقال سريع + نظيف
+      setTimeout(()=> window.location.href = url, 80);
+    }
+
+    async function boot(){
+      // نعطي انطباع تحميل بسيط
+      await new Promise(r => setTimeout(r, 700));
+
+      try{
+        const res = await fetch("./api/me.php", {
+          method: "GET",
+          credentials: "include"   // ✅ مهم للجلسات
+        });
+
+        const data = await res.json().catch(()=> ({}));
+
+        if(!res.ok || !data.ok){
+          statusTxt.textContent = "Redirecting to login…";
+          return go("login.html");
+        }
+
+        const hasAnalysis = Number(data.user?.hasAnalysis ?? 0);
+
+        if(hasAnalysis === 0){
+          statusTxt.textContent = "No analysis yet — starting assessment…";
+          // عندك خيارين حسب شغلك:
+          // go("assessment.html");
+          return go("device-connect.html");
+        }
+
+        statusTxt.textContent = "Welcome back — opening Courses…";
+        return go("courses.html");
+
+      }catch(e){
+        statusTxt.textContent = "Network issue — opening login…";
+        return go("login.html");
+      }
+    }
+
+    boot();
+  </script>
+</body>
+</html>

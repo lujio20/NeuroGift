@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NeuroGift | Sign Up</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] } } } }
+  </script>
+
+  <style>
+    body{
+      background-image:url('bg.png');
+      background-size:cover;
+      background-position:center;
+      background-repeat:no-repeat;
+      background-attachment:fixed;
+    }
+    .overlay{
+      background:
+        radial-gradient(circle at 50% 25%, rgba(18,48,92,0.35), rgba(7,10,18,0.92) 65%),
+        linear-gradient(to bottom, rgba(10,14,23,0.45), rgba(10,14,23,0.92));
+    }
+    input:-webkit-autofill{
+      -webkit-text-fill-color: #fff;
+      -webkit-box-shadow: 0 0 0px 1000px rgba(0,0,0,0.18) inset;
+    }
+    .fit-vh{ transform-origin: top center; }
+    @media (max-height: 820px){ .fit-vh{ transform: scale(.95); } }
+    @media (max-height: 760px){ .fit-vh{ transform: scale(.9); } }
+    @media (max-height: 700px){ .fit-vh{ transform: scale(.85); } }
+
+    .page-enter { opacity: 1; transform: translateY(0); transition: 320ms ease; }
+    .page-leave { opacity: 0; transform: translateY(10px); }
+
+    /* Modal */
+    .modal-hide{ opacity:0; transform: translateY(10px); pointer-events:none; }
+    .modal-show{ opacity:1; transform: translateY(0); pointer-events:auto; }
+  </style>
+</head>
+
+<body class="font-sans text-white h-screen overflow-hidden relative">
+  <div class="overlay absolute inset-0 z-0"></div>
+
+  <main class="relative z-10 h-screen flex items-center justify-center px-6">
+    <div id="page" class="page-enter w-full">
+      <div class="fit-vh w-full max-w-2xl mx-auto flex flex-col items-center">
+
+        <img src="logo.png" alt="NeuroGift Logo"
+          class="w-24 h-24 object-contain drop-shadow-[0_0_26px_rgba(120,200,255,0.45)] mb-4" />
+
+        <h1 class="text-4xl sm:text-5xl font-bold tracking-tight mb-2">Create Account ✨</h1>
+        <p class="text-white/70 mb-6">Join NeuroGift and start your journey</p>
+
+        <div id="msg" class="hidden w-full mb-3 text-center text-sm"></div>
+
+        <form class="w-full space-y-5" onsubmit="signup(event)">
+          <input id="fullName" type="text" placeholder="Full Name"
+            class="w-full h-14 px-6 rounded-2xl bg-white/5 backdrop-blur-md border border-white/30
+                   text-white placeholder-white/70 focus:border-sky-300/70 focus:ring-2 focus:ring-sky-300/15
+                   outline-none transition"/>
+
+          <input id="email" type="email" placeholder="Email Address"
+            class="w-full h-14 px-6 rounded-2xl bg-white/5 backdrop-blur-md border border-white/30
+                   text-white placeholder-white/70 focus:border-sky-300/70 focus:ring-2 focus:ring-sky-300/15
+                   outline-none transition"/>
+
+          <input id="password" type="password" placeholder="Password"
+            class="w-full h-14 px-6 rounded-2xl bg-white/5 backdrop-blur-md border border-white/30
+                   text-white placeholder-white/70 focus:border-sky-300/70 focus:ring-2 focus:ring-sky-300/15
+                   outline-none transition"/>
+
+          <input id="confirm" type="password" placeholder="Confirm Password"
+            class="w-full h-14 px-6 rounded-2xl bg-white/5 backdrop-blur-md border border-white/30
+                   text-white placeholder-white/70 focus:border-sky-300/70 focus:ring-2 focus:ring-sky-300/15
+                   outline-none transition"/>
+
+          <button id="signupBtn" type="submit"
+            class="w-full h-14 rounded-2xl bg-[#6D1FD3] hover:bg-[#7B2BE6]
+                   text-white text-xl font-semibold shadow-[0_10px_30px_rgba(109,31,211,0.25)]
+                   active:scale-[0.99] transition">
+            Sign up
+          </button>
+
+          <p class="text-center text-white/70 pt-2">
+            Already have an account?
+            <button type="button" onclick="go('login.html')" class="text-sky-300 hover:text-sky-200 font-semibold">
+              Sign in
+            </button>
+          </p>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <!-- ===== New User Modal ===== -->
+  <div id="modalWrap" class="fixed inset-0 z-50 flex items-center justify-center px-6 transition-all duration-200 modal-hide">
+    <div class="absolute inset-0 bg-black/55 backdrop-blur-sm"></div>
+
+    <div class="relative w-full max-w-lg rounded-3xl bg-white/7 border border-white/15 backdrop-blur-xl p-7 shadow-[0_30px_90px_rgba(0,0,0,0.55)]">
+      <div class="flex items-start gap-4">
+        <div class="w-12 h-12 rounded-2xl bg-sky-400/10 border border-sky-300/20 flex items-center justify-center">
+          <span class="text-sky-200 text-xl">✨</span>
+        </div>
+        <div>
+          <h2 class="text-2xl font-bold tracking-tight">Welcome to NeuroGift</h2>
+          <p class="text-white/70 mt-2 leading-relaxed text-sm">
+            You’re new here — so we don’t have any analysis yet.
+            <br>
+            Wear the device and take a quick assessment (less than a minute) so we can identify your intelligence style
+            and personalize your learning experience.
+          </p>
+        </div>
+      </div>
+
+      <div class="mt-6 flex flex-col sm:flex-row gap-3">
+        <button onclick="startFirstAnalysis()"
+          class="w-full sm:w-auto flex-1 py-3 rounded-2xl bg-[#6D1FD3] hover:bg-[#7B2BE6] font-semibold transition">
+          Start Now
+        </button>
+
+        <button onclick="skipToCourses()"
+          class="w-full sm:w-auto flex-1 py-3 rounded-2xl bg-white/5 border border-white/15 hover:bg-white/10 transition text-white/85">
+          Later
+        </button>
+      </div>
+
+      <p class="mt-4 text-[11px] text-white/45">
+        You can view your results later from the Home page icon.
+      </p>
+    </div>
+  </div>
+
+  <script>
+    function go(url){
+      const page = document.getElementById('page');
+      page.classList.add('page-leave');
+      setTimeout(()=> window.location.href = url, 220);
+    }
+
+    function setMsg(text, ok=false){
+      const el = document.getElementById('msg');
+      el.className = ok
+        ? "w-full mb-3 text-center text-sm text-emerald-200"
+        : "w-full mb-3 text-center text-sm text-rose-200";
+      el.textContent = text;
+      el.classList.remove('hidden');
+    }
+
+    function showModal(){
+      const wrap = document.getElementById("modalWrap");
+      wrap.classList.remove("modal-hide");
+      wrap.classList.add("modal-show");
+    }
+    function hideModal(){
+      const wrap = document.getElementById("modalWrap");
+      wrap.classList.add("modal-hide");
+      wrap.classList.remove("modal-show");
+    }
+
+    // modal actions
+    function startFirstAnalysis(){
+      // flag only for this browser session (optional)
+      sessionStorage.setItem("ng_flow_first_analysis", "1");
+      window.location.href = "device-connect.html";
+    }
+    function skipToCourses(){
+      sessionStorage.setItem("ng_flow_first_analysis", "0");
+      window.location.href = "courses.html";
+    }
+
+    async function signup(e){
+      e.preventDefault();
+
+      const fullName = document.getElementById("fullName").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+      const confirm = document.getElementById("confirm").value;
+
+      if(!fullName || !email || !password || !confirm){
+        setMsg("Please fill all fields.");
+        return;
+      }
+      if(password !== confirm){
+        setMsg("Passwords do not match.");
+        return;
+      }
+      if(password.length < 6){
+        setMsg("Password must be at least 6 characters.");
+        return;
+      }
+
+      const btn = document.getElementById("signupBtn");
+      btn.disabled = true;
+      btn.textContent = "Creating...";
+
+      try{
+        // IMPORTANT: send FormData because signup.php reads $_POST
+        const fd = new FormData();
+        fd.append("full_name", fullName);
+        fd.append("email", email);
+        fd.append("password", password);
+
+        const res = await fetch("./api/signup.php", { method: "POST", body: fd });
+        const data = await res.json();
+
+        if(!data.ok){
+          setMsg(data.error || "Sign up failed.");
+          return;
+        }
+
+        // New user => show modal (this is your flow)
+        setMsg("✅ Account created!", true);
+
+        // optional: keep basic info in sessionStorage for UI only
+        sessionStorage.setItem("ng_user_name", data.user?.fullName || fullName);
+        sessionStorage.setItem("ng_user_id", data.user?.id || "");
+
+        // ALWAYS new here (because signup endpoint creates new)
+        showModal();
+
+      }catch(err){
+        setMsg("Network error. Check Apache/PHP.");
+      }finally{
+        btn.disabled = false;
+        btn.textContent = "Sign up";
+      }
+    }
+  </script>
+</body>
+</html>

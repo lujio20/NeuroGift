@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NeuroGift | App Shell</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter','sans-serif'] },
+        }
+      }
+    }
+  </script>
+
+  <style>
+    :root{
+      --bg:#020617;
+      --panel: rgba(15, 23, 42, 0.62);
+      --stroke: rgba(255,255,255,0.10);
+      --stroke2: rgba(255,255,255,0.07);
+      --cyan:#2CAEFF;
+      --textDim: rgba(255,255,255,0.62);
+    }
+
+    html, body { height: 100%; }
+    body{
+      background: var(--bg);
+      color:#fff;
+      overflow: hidden;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    }
+
+    .circuit-bg{
+      position: fixed; inset:0; z-index:-3;
+      background-image:
+        linear-gradient(to right, rgba(44,174,255,0.035) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(44,174,255,0.035) 1px, transparent 1px);
+      background-size: 56px 56px;
+    }
+    .glow-field{
+      position: fixed; inset:0; z-index:-2;
+      background:
+        radial-gradient(circle at 50% 18%, rgba(44,174,255,0.10), transparent 55%),
+        radial-gradient(circle at 70% 45%, rgba(109,31,211,0.10), transparent 60%),
+        radial-gradient(circle at 10% 60%, rgba(44,174,255,0.06), transparent 60%),
+        linear-gradient(to bottom, rgba(2,6,23,0.2), rgba(2,6,23,1));
+      pointer-events:none;
+    }
+    .scanlines{
+      position:fixed; inset:0; z-index:-1;
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(255,255,255,0.02),
+        rgba(255,255,255,0.02) 1px,
+        transparent 1px,
+        transparent 10px
+      );
+      opacity: 0.22;
+      pointer-events:none;
+    }
+
+    .panel{
+      background: var(--panel);
+      border: 1px solid var(--stroke);
+      border-radius: 26px;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 40px 140px rgba(0,0,0,0.65), inset 0 0 0 1px rgba(255,255,255,0.06);
+    }
+
+    .nav-item{
+      display:flex; align-items:center; gap:12px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.06);
+      background: rgba(255,255,255,0.02);
+      transition: .2s;
+      color: rgba(255,255,255,0.72);
+      font-weight: 900;
+      letter-spacing: .10em;
+      text-transform: uppercase;
+      font-size: 11px;
+      user-select: none;
+    }
+    .nav-item:hover{
+      background: rgba(255,255,255,0.05);
+      border-color: rgba(44,174,255,0.20);
+      color: rgba(255,255,255,0.9);
+    }
+    .nav-item.active{
+      background: rgba(44,174,255,0.10);
+      border-color: rgba(44,174,255,0.40);
+      box-shadow: 0 0 18px rgba(44,174,255,0.12);
+      color: rgba(255,255,255,0.95);
+    }
+
+    .btn-ghost{
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.04);
+      transition: .22s;
+      border-radius: 16px;
+    }
+    .btn-ghost:hover{ background: rgba(255,255,255,0.08); }
+
+    .btn-primary{
+      border: 1px solid rgba(44,174,255,0.35);
+      background: rgba(44,174,255,0.12);
+      transition: .22s;
+      border-radius: 16px;
+    }
+    .btn-primary:hover{
+      background: rgba(44,174,255,0.20);
+      box-shadow: 0 0 18px rgba(44,174,255,0.18);
+    }
+
+    .input{
+      width:100%;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.03);
+      padding: 12px 14px;
+      outline: none;
+      color: rgba(255,255,255,0.9);
+    }
+    .input:focus{
+      border-color: rgba(44,174,255,0.35);
+      box-shadow: 0 0 0 4px rgba(44,174,255,0.08);
+    }
+
+    .content-shell{
+      height: calc(100vh - 32px);
+      border-radius: 28px;
+      overflow: hidden;
+    }
+
+    .dash-iframe{
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display:block;
+      background: transparent;
+    }
+
+    .settings-scroll{
+      height: 100%;
+      overflow: auto;
+      padding-right: 6px;
+    }
+    .settings-scroll::-webkit-scrollbar{ width: 8px; }
+    .settings-scroll::-webkit-scrollbar-thumb{
+      background: rgba(255,255,255,0.10);
+      border-radius: 99px;
+    }
+
+    .card{
+      border: 1px solid var(--stroke2);
+      border-radius: 22px;
+      background: rgba(255,255,255,0.03);
+      box-shadow: 0 16px 60px rgba(0,0,0,0.50);
+    }
+
+    .back-courses{
+      width: 100%;
+      display:flex; align-items:center; justify-content:center; gap:10px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      border: 1px solid rgba(44,174,255,0.22);
+      background: rgba(44,174,255,0.10);
+      color: rgba(255,255,255,0.92);
+      font-weight: 900;
+      letter-spacing: .10em;
+      text-transform: uppercase;
+      font-size: 11px;
+      transition: .2s;
+      box-shadow: 0 0 18px rgba(44,174,255,0.08);
+      user-select:none;
+    }
+    .back-courses:hover{
+      background: rgba(44,174,255,0.16);
+      border-color: rgba(44,174,255,0.35);
+      transform: translateY(-1px);
+      box-shadow: 0 0 22px rgba(44,174,255,0.14);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="circuit-bg"></div>
+  <div class="glow-field"></div>
+  <div class="scanlines"></div>
+
+  <div class="h-screen p-4 sm:p-6">
+    <div class="content-shell flex gap-4 sm:gap-6">
+
+      <aside class="hidden lg:block w-[300px]">
+        <div class="panel h-full p-5 flex flex-col">
+          <div class="flex items-center gap-3">
+            <img src="logo.png" alt="NeuroGift" class="w-10 h-10 drop-shadow-[0_0_10px_rgba(44,174,255,0.28)]">
+            <div class="leading-none">
+              <div class="text-lg font-black italic tracking-tighter">
+                NEURO<span class="text-sky-400">GIFT</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-6 flex flex-col items-center text-center">
+            <div class="w-14 h-14 rounded-2xl border border-white/10 bg-white/5 flex items-center justify-center overflow-hidden">
+              <img src="brain-front.png" class="w-10 h-10 object-contain opacity-90" alt="Avatar">
+            </div>
+            <div class="mt-3 font-extrabold text-white/90" id="sideName">User</div>
+            <div class="mt-1 text-[12px] text-white/45" id="sideEmail">—</div>
+
+            <button class="back-courses mt-4" onclick="goCourses()">
+              <span style="opacity:.85;">←</span>
+              Back to Courses
+            </button>
+          </div>
+
+          <div class="mt-6 grid gap-2">
+            <button class="nav-item active" data-view="dashboard">
+              <span class="text-white/60">▣</span> Dashboard
+            </button>
+            <button class="nav-item" data-view="subscription">
+              <span class="text-white/60">✦</span> Subscription
+            </button>
+            <button class="nav-item" data-view="settings">
+              <span class="text-white/60">⚙</span> Settings
+            </button>
+          </div>
+
+          <div class="mt-auto text-center text-[10px] text-white/25 font-black tracking-[0.4em] uppercase">
+            Demo Build · NeuroGift
+          </div>
+        </div>
+      </aside>
+
+      <main class="flex-1">
+        <div class="panel h-full p-4 sm:p-5">
+
+          <section id="view_dashboard" class="h-full">
+            <iframe class="dash-iframe" src="dashboard.html" title="NeuroGift Dashboard"></iframe>
+          </section>
+
+          <section id="view_subscription" class="h-full hidden">
+            <div class="settings-scroll">
+              <div class="card p-6">
+                <div class="text-[10px] font-black tracking-[0.30em] uppercase text-white/45">Subscription</div>
+                <div class="mt-2 text-2xl font-black">Your Plan</div>
+                <div class="mt-2 text-white/60 text-sm leading-relaxed">
+                  Put your subscription UI here (pricing, renewal, upgrade). Keep it simple.
+                </div>
+
+                <div class="mt-6 grid sm:grid-cols-2 gap-4">
+                  <div class="card p-5">
+                    <div class="text-white/80 font-extrabold">Basic</div>
+                    <div class="text-white/55 text-sm mt-1">Free</div>
+                    <button class="mt-4 px-4 py-3 w-full btn-ghost text-[11px] font-black uppercase tracking-widest">
+                      Current
+                    </button>
+                  </div>
+
+                  <div class="card p-5 border border-sky-400/20">
+                    <div class="text-white/90 font-extrabold">Pro</div>
+                    <div class="text-white/55 text-sm mt-1">$9 / month</div>
+                    <button class="mt-4 px-4 py-3 w-full btn-primary text-[11px] font-black uppercase tracking-widest">
+                      Upgrade
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section id="view_settings" class="h-full hidden">
+            <div class="settings-scroll">
+              <div class="card p-6">
+                <div class="text-[10px] font-black tracking-[0.30em] uppercase text-white/45">Settings</div>
+                <div class="mt-2 text-2xl font-black">Account & App</div>
+                <div class="mt-2 text-white/60 text-sm">Only shows when you open settings.</div>
+
+                <div class="mt-6 grid gap-4">
+                  <div class="card p-5">
+                    <div class="text-white/80 font-extrabold">Account</div>
+                    <div class="mt-4 grid gap-3">
+                      <div>
+                        <div class="text-[10px] font-black tracking-[0.30em] uppercase text-white/40">Name</div>
+                        <input id="inName" class="input mt-2" placeholder="Your name" />
+                      </div>
+                      <div>
+                        <div class="text-[10px] font-black tracking-[0.30em] uppercase text-white/40">Email</div>
+                        <input id="inEmail" class="input mt-2" placeholder="email@example.com" />
+                      </div>
+                      <button id="saveAccount" class="mt-2 px-4 py-3 btn-primary text-[11px] font-black uppercase tracking-widest">
+                        Save
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="card p-5">
+                    <div class="text-white/80 font-extrabold">Security</div>
+                    <div class="text-white/55 text-sm mt-2">
+                      Logout should end the PHP session (server) + clear demo cache (client).
+                    </div>
+                    <button id="logoutBtn" class="mt-4 px-4 py-3 btn-ghost text-[11px] font-black uppercase tracking-widest">
+                      Logout
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+        </div>
+      </main>
+
+    </div>
+  </div>
+
+  <script>
+    function safeParseJSON(raw){ try{ return JSON.parse(raw); } catch(e){ return null; } }
+
+    function loadUser(){
+      const base = { name:"Lujain", email:"lujain@example.com" };
+      const uRaw = sessionStorage.getItem("ng_user");
+      const u = uRaw ? safeParseJSON(uRaw) : null;
+      return {
+        name: (u && u.name) ? u.name : base.name,
+        email:(u && u.email)? u.email: base.email
+      };
+    }
+
+    function saveUser(u){
+      sessionStorage.setItem("ng_user", JSON.stringify(u));
+    }
+
+    function setActive(view){
+      const views = {
+        dashboard: document.getElementById("view_dashboard"),
+        subscription: document.getElementById("view_subscription"),
+        settings: document.getElementById("view_settings"),
+      };
+      Object.keys(views).forEach(k=>{
+        views[k].classList.toggle("hidden", k !== view);
+      });
+
+      document.querySelectorAll("[data-view]").forEach(btn=>{
+        btn.classList.toggle("active", btn.dataset.view === view);
+      });
+    }
+
+    function goCourses(){
+      window.location.href = "courses.html";
+    }
+
+    // ✅ Logout الحقيقي: يقتل PHP session من السيرفر
+    async function serverLogout(){
+      const btn = document.getElementById("logoutBtn");
+      const old = btn.textContent;
+
+      btn.disabled = true;
+      btn.textContent = "Logging out...";
+
+      try{
+        // مهم: credentials same-origin عشان الكوكيز (PHPSESSID) تنرسل
+        await fetch("./api/logout.php", {
+          method: "POST",
+          credentials: "same-origin",
+          headers: { "Content-Type": "application/json" }
+        });
+      }catch(e){
+        // حتى لو فشل السيرفر، نكمّل تنظيف الواجهة
+      }finally{
+        // تنظيف ديمو/واجهة
+        sessionStorage.clear();
+
+        // رجّعيه لصفحة تسجيل الدخول
+        window.location.href = "login.html";
+
+        // (ما رح يوصل هنا غالبًا بسبب redirect)
+        btn.disabled = false;
+        btn.textContent = old;
+      }
+    }
+
+    function init(){
+      const user = loadUser();
+      document.getElementById("sideName").textContent = user.name;
+      document.getElementById("sideEmail").textContent = user.email;
+
+      document.getElementById("inName").value = user.name;
+      document.getElementById("inEmail").value = user.email;
+
+      document.querySelectorAll("[data-view]").forEach(btn=>{
+        btn.addEventListener("click", ()=> setActive(btn.dataset.view));
+      });
+
+      document.getElementById("saveAccount").addEventListener("click", ()=>{
+        const nu = {
+          name: document.getElementById("inName").value.trim() || "User",
+          email: document.getElementById("inEmail").value.trim() || "—"
+        };
+        saveUser(nu);
+        document.getElementById("sideName").textContent = nu.name;
+        document.getElementById("sideEmail").textContent = nu.email;
+
+        const b = document.getElementById("saveAccount");
+        const old = b.textContent;
+        b.textContent = "Saved ✓";
+        setTimeout(()=> b.textContent = old, 900);
+      });
+
+      // ✅ ربط زر Logout بالـ server logout
+      document.getElementById("logoutBtn").addEventListener("click", serverLogout);
+
+      setActive("dashboard");
+    }
+
+    init();
+  </script>
+</body>
+</html>

@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NeuroGift | Full Courses</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter','sans-serif'] },
+          boxShadow: {
+            neon: "0 0 22px rgba(44,174,255,0.28), 0 0 0 1px rgba(44,174,255,0.14)",
+            glass: "0 30px 110px rgba(0,0,0,0.70), inset 0 0 0 1px rgba(255,255,255,0.06)",
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    :root{
+      --bg:#020617;
+      --panel: rgba(15, 23, 42, 0.62);
+      --stroke: rgba(255,255,255,0.10);
+      --stroke2: rgba(255,255,255,0.07);
+      --cyan:#2CAEFF;
+      --blue:#0B4DFF;
+      --purple:#6D1FD3;
+      --textDim: rgba(255,255,255,0.62);
+    }
+
+    body{
+      background: var(--bg);
+      color:#fff;
+      overflow-x:hidden;
+      font-size: 16px;
+    }
+
+    .circuit-bg{
+      position: fixed; inset:0; z-index:-3;
+      background-image:
+        linear-gradient(to right, rgba(44,174,255,0.035) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(44,174,255,0.035) 1px, transparent 1px);
+      background-size: 56px 56px;
+    }
+
+    .glow-field{
+      position: fixed; inset:0; z-index:-2;
+      background:
+        radial-gradient(circle at 50% 18%, rgba(44,174,255,0.10), transparent 55%),
+        radial-gradient(circle at 70% 45%, rgba(109,31,211,0.10), transparent 60%),
+        radial-gradient(circle at 10% 60%, rgba(44,174,255,0.06), transparent 60%),
+        linear-gradient(to bottom, rgba(2,6,23,0.2), rgba(2,6,23,1));
+      pointer-events:none;
+    }
+
+    .scanlines{
+      position:fixed; inset:0; z-index:-1;
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(255,255,255,0.02),
+        rgba(255,255,255,0.02) 1px,
+        transparent 1px,
+        transparent 10px
+      );
+      opacity: 0.22;
+      pointer-events:none;
+    }
+
+    .panel{
+      background: var(--panel);
+      border: 1px solid var(--stroke);
+      border-radius: 26px;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+
+    .card{
+      border: 1px solid var(--stroke2);
+      border-radius: 22px;
+      background: rgba(255,255,255,0.03);
+      box-shadow: 0 16px 60px rgba(0,0,0,0.50);
+      transition: transform .22s ease, border-color .22s ease, background .22s ease;
+    }
+    .card:hover{
+      transform: translateY(-3px);
+      border-color: rgba(44,174,255,0.28);
+      background: rgba(255,255,255,0.045);
+    }
+
+    .btn-ghost{
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.04);
+      transition: .22s;
+    }
+    .btn-ghost:hover{ background: rgba(255,255,255,0.08); }
+
+    .btn-purple{
+      border: 1px solid rgba(109,31,211,0.35);
+      background: rgba(109,31,211,0.10);
+      transition: .22s;
+    }
+    .btn-purple:hover{
+      background: rgba(109,31,211,0.18);
+      box-shadow: 0 0 18px rgba(109,31,211,0.25);
+    }
+
+    .btn-transform{
+      border: 1px solid rgba(44,174,255,0.35);
+      background: rgba(44,174,255,0.12);
+      transition: .22s;
+    }
+    .btn-transform:hover{
+      background: rgba(44,174,255,0.20);
+      box-shadow: 0 0 18px rgba(44,174,255,0.18);
+    }
+
+    .poster{
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background:
+        radial-gradient(140px 90px at 30% 30%, rgba(44,174,255,0.20), transparent 60%),
+        radial-gradient(140px 90px at 70% 70%, rgba(109,31,211,0.18), transparent 60%),
+        linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+      position: relative;
+      overflow: hidden;
+    }
+    .poster::after{
+      content:"";
+      position:absolute; inset:-40px;
+      background: radial-gradient(circle at 30% 40%, rgba(255,255,255,0.08), transparent 50%);
+      transform: rotate(12deg);
+      opacity: .45;
+    }
+
+    .container-web {
+      width: 100%;
+      max-width: none;
+      padding-inline: 5%;
+      margin: 0;
+    }
+    @media(min-width:640px){ .container-web{ padding-inline: 1.5rem; } }
+    @media(min-width:1024px){ .container-web{ padding-inline: 2rem; } }
+
+    .line-clamp-2{
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .rec-title{ display:flex; align-items:center; gap:14px; }
+    .rec-title .bar{
+      width:6px; height:32px;
+      border-radius:999px;
+      background: rgba(255,255,255,0.9);
+      opacity:.85;
+    }
+
+    .logo-wrap{
+      width:44px; height:44px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.04);
+      display:flex; align-items:center; justify-content:center;
+      overflow:hidden;
+    }
+    .logo-wrap img{
+      width: 30px; height: 30px;
+      object-fit: contain;
+      filter: drop-shadow(0 0 10px rgba(44,174,255,0.15));
+    }
+    .fallback-letter{
+      font-size: 14px;
+      font-weight: 900;
+      opacity: .9;
+    }
+
+    select, option{
+      color: #fff;
+      background: rgba(15, 23, 42, 0.95);
+    }
+
+    /* Filter pills */
+    .pill{
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.04);
+      transition: .2s;
+      user-select:none;
+    }
+    .pill:hover{ background: rgba(255,255,255,0.08); }
+    .pill.active{
+      border-color: rgba(44,174,255,0.40);
+      background: rgba(44,174,255,0.10);
+      box-shadow: 0 0 18px rgba(44,174,255,0.12);
+    }
+
+    /* Modal */
+    .modal-backdrop{
+      position: fixed; inset:0;
+      background: rgba(0,0,0,0.60);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding: 16px;
+      z-index: 9999;
+    }
+    .modal{
+      width: 100%;
+      max-width: 1100px;
+      border-radius: 22px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(15,23,42,0.90);
+      box-shadow: 0 30px 120px rgba(0,0,0,0.75);
+      overflow: hidden;
+      position: relative;
+    }
+    .modal::before{
+      content:"";
+      position:absolute; inset:0;
+      pointer-events:none;
+      background:
+        radial-gradient(560px 260px at 18% 0%, rgba(44,174,255,0.20), transparent 60%),
+        radial-gradient(560px 260px at 82% 0%, rgba(109,31,211,0.18), transparent 60%);
+      opacity: .95;
+    }
+    .modal-body{
+      max-height: 82vh;
+      overflow: auto;
+      padding: 24px;
+      position: relative;
+      z-index: 1;
+    }
+    .course-mini{
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.02);
+      padding: 12px 12px;
+      transition: .22s;
+    }
+    .course-mini:hover{
+      border-color: rgba(44,174,255,0.22);
+      background: rgba(255,255,255,0.04);
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+
+<body class="font-sans">
+  <div class="circuit-bg"></div>
+  <div class="glow-field"></div>
+  <div class="scanlines"></div>
+
+  <!-- NAV -->
+  <nav class="sticky top-0 z-50 border-b border-white/5 bg-black/35 backdrop-blur-md">
+    <div class="container-web py-4 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <img src="logo.png" alt="NeuroGift" class="w-10 h-10 drop-shadow-[0_0_10px_rgba(44,174,255,0.28)]">
+        <div class="leading-none">
+          <div class="text-lg font-black italic tracking-tighter">
+            NEURO<span class="text-sky-400">GIFT</span>
+          </div>
+          <div class="text-[10px] text-white/40 tracking-[0.28em] font-bold uppercase">Courses Engine</div>
+        </div>
+      </div>
+
+      <div class="hidden md:flex items-center gap-10 text-xs font-bold text-white/60">
+        <a href="courses.html" class="hover:text-sky-400 transition uppercase tracking-widest">Home</a>
+        <a href="full-courses.html" class="text-sky-400 uppercase tracking-widest">Full Courses</a>
+        <a href="dashboard.html" class="hover:text-sky-400 transition uppercase tracking-widest">Dashboard</a>
+      </div>
+
+      <div class="flex items-center gap-3 ml-auto">
+        <a href="courses.html"
+           class="inline-flex items-center gap-2 px-4 py-2 rounded-xl btn-ghost text-[10px] font-black uppercase tracking-widest text-white/60 hover:text-white">
+          ← Back
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HEADER -->
+  <header class="container-web pt-10">
+    <div class="panel p-6 sm:p-8 lg:p-10 relative overflow-hidden">
+      <div class="absolute inset-0 pointer-events-none opacity-80"
+           style="background:
+            radial-gradient(900px 420px at 15% 35%, rgba(44,174,255,0.10), transparent 60%),
+            radial-gradient(900px 520px at 85% 35%, rgba(109,31,211,0.08), transparent 62%),
+            linear-gradient(to bottom, rgba(2,6,23,0.25), rgba(2,6,23,0.8));">
+      </div>
+
+      <div class="relative">
+        <div class="rec-title">
+          <div class="bar"></div>
+          <div class="min-w-0">
+            <h1 class="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-white/90">
+              Full courses catalog
+            </h1>
+            <p class="mt-2 text-white/40 text-sm">
+              Default: <b>For You</b>. Switch to <b>Needs Transform</b> to discover courses that require conversion.
+            </p>
+          </div>
+        </div>
+
+        <!-- FILTER PILLS -->
+        <div class="mt-6 flex flex-wrap gap-2 items-center">
+          <span class="text-[11px] font-black tracking-[0.28em] uppercase text-white/35 mr-1">View</span>
+
+          <button class="pill px-4 py-2 text-[11px] font-black uppercase tracking-widest text-white/70"
+                  id="pillForYou" data-filter="best">For you</button>
+
+          <button class="pill px-4 py-2 text-[11px] font-black uppercase tracking-widest text-white/70"
+                  id="pillNeeds" data-filter="needs">Needs transform</button>
+
+          <button class="pill px-4 py-2 text-[11px] font-black uppercase tracking-widest text-white/70"
+                  id="pillAll" data-filter="all">All catalog</button>
+
+          <div class="ml-auto text-[11px] text-white/35">
+            Pattern: <span id="patternDisplay" class="font-black text-sky-300">Visual-Spatial</span>
+            <span class="mx-2 text-white/20">·</span>
+            Showing: <span id="activeFilterLabel" class="font-black text-white/70">For you</span>
+          </div>
+        </div>
+
+        <div class="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <!-- Search -->
+          <div class="lg:col-span-2">
+            <div class="flex items-center gap-4 bg-white/5 border border-white/10 focus-within:border-sky-400/50 focus-within:bg-white/10 transition-all duration-300 rounded-2xl px-5 h-14 w-full shadow-2xl shadow-black/20">
+              <svg class="w-5 h-5 text-sky-400/80" viewBox="0 0 24 24" fill="none">
+                <path d="M21 21l-4.3-4.3m1.3-5.2a7.5 7.5 0 11-15 0 7.5 7.5 0 0115 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              <input id="searchInput" type="text" placeholder="Search courses (UX, CSS, Security...)"
+                     class="w-full bg-transparent outline-none text-sm sm:text-base text-white placeholder-white/30 h-full">
+              <span id="resultCount" class="hidden sm:block text-[11px] text-white/20 font-bold whitespace-nowrap bg-white/5 px-2 py-1 rounded">0 items</span>
+            </div>
+          </div>
+
+          <!-- Platform filter -->
+          <div class="flex gap-3">
+            <div class="w-full">
+              <div class="text-[10px] text-white/30 font-black tracking-widest uppercase mb-2">Platform</div>
+              <select id="platformSelect"
+                      class="w-full h-14 rounded-2xl bg-white/5 border border-white/10 px-4 text-sm text-white/70 outline-none focus:border-sky-400/50">
+                <option value="__all__">All platforms</option>
+              </select>
+            </div>
+            <div class="pt-7">
+              <button id="clearBtn"
+                      class="h-14 px-5 rounded-2xl btn-purple text-[10px] font-black uppercase tracking-widest text-purple-200 whitespace-nowrap">
+                Clear
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Active platform chip -->
+        <div class="mt-6 flex items-center gap-3">
+          <div id="activePlatformWrap" class="hidden items-center gap-3">
+            <div id="activeLogo" class="logo-wrap"></div>
+            <div class="text-[11px] text-white/40">
+              Showing platform:
+              <span id="activePlatform" class="font-black text-white/80"></span>
+            </div>
+          </div>
+          <div class="ml-auto text-[11px] text-white/35">
+            Total (in view): <span id="totalCount" class="font-bold text-white/60">0</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- GRID -->
+  <main class="container-web pb-20 pt-10">
+    <section class="px-2">
+      <div id="grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"></div>
+      <div id="emptyState" class="hidden mt-10 text-center">
+        <div class="text-white/70 font-black text-xl">No results</div>
+        <div class="mt-2 text-white/35 text-sm">Try another keyword, switch platform, or change the view filter.</div>
+      </div>
+    </section>
+
+    <footer class="pt-12 border-t border-white/5 text-center mt-14">
+      <div class="text-[10px] text-white/25 font-black tracking-[0.4em] uppercase">
+        Powered by NeuroGift AI Engine · Demo Build
+      </div>
+      <div class="mt-3 text-[11px] text-white/35">
+        Privacy · About · Contact
+      </div>
+    </footer>
+  </main>
+
+  <!-- Transform Modal -->
+  <div id="transformBackdrop" class="modal-backdrop">
+    <div class="modal">
+      <div class="modal-body">
+        <div class="flex items-start justify-between gap-4">
+          <div class="min-w-0">
+            <div class="text-[11px] font-black tracking-[0.30em] uppercase text-white/40">NeuroGift Transform</div>
+            <div class="mt-2 text-2xl sm:text-3xl font-black tracking-tight">
+              Convert this course into a
+              <span class="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-blue-500" id="modalPatternWord">Visual</span>
+              learning format
+            </div>
+            <div class="mt-2 text-white/55 text-sm sm:text-base leading-relaxed max-w-2xl">
+              Demo: we generate a visual-friendly version (concept map, keywords, flashcards, chapters).
+            </div>
+          </div>
+
+          <div class="flex gap-2 shrink-0">
+            <button id="openFullTransformed"
+                    class="px-4 py-2 rounded-xl btn-transform text-[11px] font-black uppercase tracking-widest">
+              Open full lesson
+            </button>
+
+            <button id="closeTransform"
+                    class="px-4 py-2 rounded-xl btn-ghost text-[11px] font-black uppercase tracking-widest">
+              Close
+            </button>
+          </div>
+        </div>
+
+        <div class="mt-6 panel p-5">
+          <div class="text-[11px] font-black tracking-[0.30em] uppercase text-white/35">Selected course</div>
+          <div class="mt-2 text-xl font-extrabold" id="tTitle">—</div>
+          <div class="mt-1 text-white/45 text-sm" id="tProvider">—</div>
+
+          <div class="mt-5 grid sm:grid-cols-2 gap-4">
+            <div class="card p-5">
+              <div class="text-[11px] font-black tracking-[0.30em] uppercase text-white/40">What we generate</div>
+              <ul class="mt-3 text-white/60 text-sm leading-relaxed list-disc pl-5">
+                <li>Concept map + flow diagrams</li>
+                <li>Keywords chips + visual flashcards</li>
+                <li>Chapters structure</li>
+                <li>1-page visual cheat sheet</li>
+              </ul>
+            </div>
+
+            <div class="card p-5">
+              <div class="text-[11px] font-black tracking-[0.30em] uppercase text-white/40">Demo action</div>
+              <div class="mt-3 text-white/60 text-sm leading-relaxed">
+                Click “Run Transform” to generate a preview and unlock the full lesson page.
+              </div>
+
+              <button id="demoTransformBtn"
+                      class="mt-5 w-full px-5 py-3 rounded-2xl btn-transform text-[11px] font-black uppercase tracking-widest">
+                Run Transform (Demo)
+              </button>
+
+              <div id="demoResult" class="mt-4 hidden text-white/60 text-sm">
+                ✅ Transform generated (demo). Full lesson is ready.
+              </div>
+            </div>
+          </div>
+
+          <div id="transformOutput" class="mt-5 hidden">
+            <div class="card p-5">
+              <div class="flex items-start justify-between gap-4 flex-wrap">
+                <div class="min-w-0">
+                  <div class="text-[11px] font-black tracking-[0.30em] uppercase text-white/40">Preview</div>
+                  <div class="mt-1 text-white/60 text-sm">
+                    A <span class="text-sky-300 font-black">visual-first</span> structure (not just bullet points).
+                  </div>
+                </div>
+                <div class="flex gap-2">
+                  <button id="copyKeywordsBtn"
+                    class="px-4 py-2 rounded-xl btn-ghost text-[11px] font-black uppercase tracking-widest">
+                    Copy keywords
+                  </button>
+                  <button id="regenBtn"
+                    class="px-4 py-2 rounded-xl btn-transform text-[11px] font-black uppercase tracking-widest">
+                    Regenerate
+                  </button>
+                </div>
+              </div>
+
+              <div class="mt-4 grid lg:grid-cols-3 gap-4">
+                <div class="panel p-4">
+                  <div class="text-[11px] font-black tracking-[0.30em] uppercase text-white/40">Concept map</div>
+                  <div class="mt-3 text-white/70 text-sm leading-relaxed" id="conceptMapBox"></div>
+                </div>
+
+                <div class="panel p-4">
+                  <div class="text-[11px] font-black tracking-[0.30em] uppercase text-white/40">Keywords</div>
+                  <div class="mt-3 flex flex-wrap gap-2" id="keywordsBox"></div>
+                </div>
+
+                <div class="panel p-4">
+                  <div class="text-[11px] font-black tracking-[0.30em] uppercase text-white/40">Visual outputs</div>
+                  <ul class="mt-3 text-white/60 text-sm leading-relaxed list-disc pl-5" id="outputsBox"></ul>
+                </div>
+              </div>
+
+              <div class="mt-4 panel p-4">
+                <div class="text-[11px] font-black tracking-[0.30em] uppercase text-white/40">Flashcards</div>
+                <div class="mt-3 grid sm:grid-cols-2 gap-3" id="flashcardsBox"></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // =========================
+    // URL PARAMS
+    // =========================
+    function getQueryParam(name){
+      const url = new URL(window.location.href);
+      return url.searchParams.get(name);
+    }
+    function setQueryParam(name, value){
+      const url = new URL(window.location.href);
+      if(value === null || value === "" || value === "__all__"){
+        url.searchParams.delete(name);
+      }else{
+        url.searchParams.set(name, value);
+      }
+      window.history.replaceState({}, "", url.toString());
+    }
+
+    // =========================
+    // LOGOS
+    // =========================
+    const PLATFORM_LOGOS = {
+      "YouTube": "logos/youtube.png",
+      "Coursera": "logos/coursera.png",
+      "Satr.codes": "logos/satr.png",
+      "Satr": "logos/satr.png",
+      "Udemy": "logos/udemy.png",
+      "Skillshare": "logos/skillshare.png",
+      "Edraak": "logos/edraak.png",
+      "إدراك": "logos/edraak.png"
+    };
+
+    // =========================
+    // USER PATTERN (dynamic)
+    // =========================
+    let USER_PATTERN = "visual"; // visual | logical | verbal | focus | auditory ...
+    let USER_PATTERN_DISPLAY = "Visual-Spatial";
+
+    // =========================
+    // STATE
+    // =========================
+    let ACTIVE_PLATFORM = "__all__";
+    let ACTIVE_VIEW = "best"; // best | needs | all
+
+    // =========================
+    // DATA (CATALOG)
+    // =========================
+    const CATALOG = [
+      // ✅ best-fit examples
+      { id:"elzero", title:"Front-End Development", provider:"YouTube · Elzero Web School", tags:["frontend","html","css","js","arabic"],
+        difficulty:"Beginner", minutes: 600, hint:"Instant visual feedback: code → UI right in front of you.",
+        url:"https://www.youtube.com/@ElzeroWebSchool/playlists", accent:"text-sky-400",
+        bestFor:["visual","kinesthetic","logical"] },
+
+      { id:"ux-google", title:"Google UX Design Professional Certificate", provider:"Coursera · Google", tags:["ux","design","wireframes","prototyping"],
+        difficulty:"Beginner", minutes: 900, hint:"Wireframes, prototypes, user flows — pure visual playground.",
+        url:"https://www.coursera.org/professional-certificates/google-ux-design", accent:"text-blue-400",
+        bestFor:["visual","verbal","logical"] },
+
+      { id:"satr-css3", title:"CSS3 Basics", provider:"Satr.codes", tags:["css","frontend","arabic"],
+        difficulty:"Beginner", minutes: 240, hint:"Short lessons + practice: shape layouts visually and immediately.",
+        url:"https://satr.codes/courses/CSS3/details", accent:"text-emerald-400",
+        bestFor:["visual","kinesthetic","logical"] },
+
+      { id:"figma-ui", title:"Figma UI Essentials", provider:"YouTube · UI Academy", tags:["ux","figma","ui","design"],
+        difficulty:"Beginner", minutes: 180, hint:"Design screens fast with components and auto-layout.",
+        url:"https://www.youtube.com/results?search_query=Figma+UI+Essentials+tutorial", accent:"text-sky-300",
+        bestFor:["visual","kinesthetic"] },
+
+      { id:"react-ui", title:"React UI Building", provider:"YouTube · Dev Studio", tags:["react","frontend","ui"],
+        difficulty:"Intermediate", minutes: 520, hint:"Build components + see UI render instantly.",
+        url:"https://www.youtube.com/results?search_query=React+UI+components+tutorial", accent:"text-sky-300",
+        bestFor:["visual","kinesthetic","logical"] },
+
+      { id:"dl-cv", title:"Deep Learning Specialization (Computer Vision parts)", provider:"Coursera · Andrew Ng", tags:["ai","cv","images","advanced"],
+        difficulty:"Intermediate", minutes: 1100, hint:"Image-based learning: ideal for visual data learners.",
+        url:"https://www.coursera.org/specializations/deep-learning", accent:"text-purple-300",
+        bestFor:["visual","logical"] },
+
+      { id:"color-typography", title:"Color & Typography for Interfaces", provider:"Skillshare · Visual UI", tags:["design","ui","visual"],
+        difficulty:"Beginner", minutes: 140, hint:"Make screens readable and calm for the eyes.",
+        url:"https://www.skillshare.com/", accent:"text-blue-300",
+        bestFor:["visual","verbal"] },
+
+      { id:"flutter-ui", title:"Flutter UI for Beginners", provider:"YouTube · Flutter Lab", tags:["flutter","ui","mobile"],
+        difficulty:"Beginner", minutes: 420, hint:"Widgets that render immediately — very visual.",
+        url:"https://www.youtube.com/results?search_query=flutter+ui+beginners", accent:"text-sky-300",
+        bestFor:["visual","kinesthetic"] },
+
+      // ❌ Needs transform examples (strong theory / audio first)
+      { id:"abdul-bari-algo", title:"Algorithms (DSA) — Abdul Bari", provider:"YouTube · Abdul Bari", tags:["algorithms","dsa","data-structures","theory"],
+        difficulty:"Intermediate", minutes: 1200, hint:"Strong theory focus. Great… but not naturally visual.",
+        url:"https://www.youtube.com/@abdul_bari/playlists", accent:"text-purple-300",
+        bestFor:["logical","verbal"] },
+
+      { id:"mit-6-006", title:"MIT 6.006 Introduction to Algorithms", provider:"YouTube · MIT OpenCourseWare", tags:["algorithms","theory","math","cs"],
+        difficulty:"Advanced", minutes: 1400, hint:"Deep theory. Powerful but heavy for pure visual learners.",
+        url:"https://www.youtube.com/@mitocw/playlists", accent:"text-blue-300",
+        bestFor:["logical","verbal"] },
+
+      { id:"discrete-math", title:"Discrete Mathematics — Proofs & Logic", provider:"YouTube · TrevTutor", tags:["discrete","logic","proofs","math"],
+        difficulty:"Intermediate", minutes: 650, hint:"Proof-heavy. Great content, not naturally visual.",
+        url:"https://www.youtube.com/@trevtutor/videos", accent:"text-purple-300",
+        bestFor:["logical","verbal"] },
+
+      { id:"os-concepts", title:"Operating Systems — Concepts & Theory", provider:"YouTube · Neso Academy", tags:["os","concepts","theory"],
+        difficulty:"Intermediate", minutes: 800, hint:"Mostly verbal theory delivery. Needs visual mapping.",
+        url:"https://www.youtube.com/@NesoAcademy/playlists", accent:"text-emerald-300",
+        bestFor:["verbal","logical"] },
+
+      { id:"dbms-theory", title:"DBMS — Full Theory Course", provider:"YouTube · Gate Smashers", tags:["dbms","database","theory","sql"],
+        difficulty:"Intermediate", minutes: 700, hint:"Fast verbal delivery. Visual learner benefits from transform.",
+        url:"https://www.youtube.com/@GateSmashers/playlists", accent:"text-sky-300",
+        bestFor:["verbal","logical"] },
+
+      { id:"audio-podcast", title:"Lecture-style CS Podcast (Audio-first)", provider:"YouTube · Audio Lectures", tags:["audio","lecture","listening"],
+        difficulty:"Beginner", minutes: 300, hint:"Audio-first learning. Great for auditory — not visual.",
+        url:"https://www.youtube.com/results?search_query=computer+science+lecture+podcast", accent:"text-purple-300",
+        bestFor:["auditory","verbal"] },
+    ];
+
+    // =========================
+    // HELPERS
+    // =========================
+    function escapeHtml(s){
+      return String(s).replace(/[&<>"']/g, (m)=>({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+      }[m]));
+    }
+
+    function minutesToLabel(mins){
+      const h = Math.round(mins/60);
+      if(h <= 1) return "≈ 1h";
+      return `≈ ${h}h`;
+    }
+
+    function extractPlatform(providerStr){
+      const left = (String(providerStr).split("·")[0] || providerStr).trim();
+      return left || "Unknown";
+    }
+
+    function platformAccentClass(name){
+      const n = name.toLowerCase();
+      if(n.includes("youtube")) return "text-sky-300";
+      if(n.includes("coursera")) return "text-blue-300";
+      if(n.includes("satr")) return "text-emerald-300";
+      if(n.includes("udemy")) return "text-purple-300";
+      if(n.includes("skillshare")) return "text-sky-300";
+      if(n.includes("edraak") || n.includes("إدراك")) return "text-emerald-300";
+      return "text-white/70";
+    }
+
+    function orderPlatforms(platforms){
+      const priority = ["YouTube", "Coursera", "Satr.codes", "Satr", "Udemy", "Skillshare", "Edraak", "إدراك"];
+      const set = new Set(platforms);
+      const picked = [];
+      priority.forEach(p=>{
+        const match = [...set].find(x => x.toLowerCase() === p.toLowerCase());
+        if(match){ picked.push(match); set.delete(match); }
+      });
+      const rest = [...set].sort((a,b)=>a.localeCompare(b));
+      return [...picked, ...rest];
+    }
+
+    function logoFor(platformName){
+      const src = PLATFORM_LOGOS[platformName] || PLATFORM_LOGOS[platformName.trim()] || "";
+      const letter = platformName.trim().slice(0,1).toUpperCase();
+      if(!src){
+        return `<span class="fallback-letter ${platformAccentClass(platformName)}">${escapeHtml(letter)}</span>`;
+      }
+      return `<img src="${escapeHtml(src)}" alt="${escapeHtml(platformName)}"
+               onerror="this.remove(); this.parentElement.innerHTML='${escapeHtml(letter)}';">`;
+    }
+
+    function isGoodForUser(course){
+      const list = Array.isArray(course.bestFor) ? course.bestFor : [];
+      return list.includes(USER_PATTERN);
+    }
+
+    function viewPasses(course){
+      const good = isGoodForUser(course);
+      if(ACTIVE_VIEW === "all") return true;
+      if(ACTIVE_VIEW === "best") return good;
+      if(ACTIVE_VIEW === "needs") return !good;
+      return true;
+    }
+
+    function poster(platform){
+      return `
+        <div class="poster h-24 w-full flex items-center justify-center mb-4">
+          <div class="relative text-center px-3">
+            <div class="text-[10px] font-black tracking-[0.35em] text-white/35 uppercase">${escapeHtml(platform)}</div>
+            <div class="text-2xl font-black italic text-white/10 mt-1">NEUROGIFT</div>
+          </div>
+        </div>
+      `;
+    }
+
+    function tagChips(tags){
+      const pick = (tags || []).slice(0,3);
+      return pick.map(t=>`
+        <span class="text-[11px] px-3 py-1 rounded-full bg-white/5 border border-white/10 text-white/55">
+          ${escapeHtml(t)}
+        </span>
+      `).join("");
+    }
+
+    function badgeChip(course){
+      const good = isGoodForUser(course);
+      if(good){
+        return `<span class="text-[10px] px-3 py-1 rounded-full bg-sky-400/10 border border-sky-400/30 text-sky-200 whitespace-nowrap">Best for you</span>`;
+      }
+      return `<span class="text-[10px] px-3 py-1 rounded-full bg-white/5 border border-white/10 text-white/55 whitespace-nowrap">Needs Transform</span>`;
+    }
+
+    function courseCard(c){
+      const platform = extractPlatform(c.provider);
+      const good = isGoodForUser(c);
+
+      const actions = good
+        ? `
+          <a href="${escapeHtml(c.url)}" target="_blank"
+             class="px-4 py-2 rounded-xl btn-ghost text-[10px] font-black uppercase tracking-widest hover:bg-white/10">
+            View
+          </a>
+        `
+        : `
+          <button type="button"
+            class="px-4 py-2 rounded-xl btn-transform text-[10px] font-black uppercase tracking-widest"
+            onclick="openTransform('${escapeHtml(c.id)}')">
+            Transform
+          </button>
+          <a href="${escapeHtml(c.url)}" target="_blank"
+             class="px-4 py-2 rounded-xl btn-ghost text-[10px] font-black uppercase tracking-widest hover:bg-white/10">
+            Original
+          </a>
+        `;
+
+      return `
+        <article class="card p-5 courseItem w-full flex flex-col h-full"
+          data-id="${escapeHtml(c.id)}"
+          data-title="${escapeHtml(c.title.toLowerCase())}"
+          data-provider="${escapeHtml(c.provider.toLowerCase())}"
+          data-platform="${escapeHtml(platform.toLowerCase())}"
+          data-tags="${escapeHtml((c.tags||[]).join(",").toLowerCase())}"
+          data-fit="${good ? "good" : "needs"}">
+
+          ${poster(platform)}
+
+          <div class="flex items-start justify-between gap-3">
+            <div class="min-w-0">
+              <div class="text-[10px] font-black tracking-[0.32em] uppercase ${c.accent || "text-white/60"}">${escapeHtml(c.provider)}</div>
+              <h4 class="mt-2 text-base sm:text-lg font-extrabold leading-snug line-clamp-2">${escapeHtml(c.title)}</h4>
+            </div>
+            ${badgeChip(c)}
+          </div>
+
+          <p class="mt-3 text-sm text-white/55 leading-relaxed line-clamp-2 flex-grow">${escapeHtml(c.hint || "")}</p>
+
+          <div class="mt-4 flex flex-wrap gap-2">
+            ${tagChips(c.tags || [])}
+          </div>
+
+          <div class="mt-5 flex items-center justify-between gap-3 pt-4 border-t border-white/5">
+            <div class="text-[11px] text-white/35">
+              <span class="font-bold text-white/55">${escapeHtml(c.difficulty || "—")}</span> · ${minutesToLabel(c.minutes || 60)}
+            </div>
+            <div class="flex gap-2">
+              ${actions}
+            </div>
+          </div>
+        </article>
+      `;
+    }
+
+    // =========================
+    // PLATFORM SELECT
+    // =========================
+    function buildPlatformSelect(platforms){
+      const sel = document.getElementById("platformSelect");
+      const current = sel.value || "__all__";
+
+      const opts = ['<option value="__all__">All platforms</option>']
+        .concat(platforms.map(p=>`<option value="${escapeHtml(p)}">${escapeHtml(p)}</option>`))
+        .join("");
+
+      sel.innerHTML = opts;
+      sel.value = current;
+    }
+
+    function updateActivePlatformUI(){
+      const wrap = document.getElementById("activePlatformWrap");
+      const label = document.getElementById("activePlatform");
+      const logo = document.getElementById("activeLogo");
+
+      if(!ACTIVE_PLATFORM || ACTIVE_PLATFORM === "__all__"){
+        wrap.classList.add("hidden");
+        wrap.classList.remove("flex");
+        return;
+      }
+
+      wrap.classList.remove("hidden");
+      wrap.classList.add("flex");
+      label.textContent = ACTIVE_PLATFORM;
+      logo.innerHTML = logoFor(ACTIVE_PLATFORM);
+    }
+
+    function setActivePillUI(){
+      const map = {
+        best: { btn:"pillForYou", label:"For you" },
+        needs:{ btn:"pillNeeds", label:"Needs transform" },
+        all:  { btn:"pillAll", label:"All catalog" }
+      };
+      document.querySelectorAll(".pill").forEach(p=>p.classList.remove("active"));
+      const picked = map[ACTIVE_VIEW] || map.best;
+      document.getElementById(picked.btn).classList.add("active");
+      document.getElementById("activeFilterLabel").textContent = picked.label;
+    }
+
+    // =========================
+    // RENDER
+    // =========================
+    function render(){
+      // build platforms list
+      const groups = {};
+      CATALOG.forEach(c=>{
+        const p = extractPlatform(c.provider);
+        if(!groups[p]) groups[p] = [];
+        groups[p].push(c);
+      });
+      const platforms = orderPlatforms(Object.keys(groups));
+      buildPlatformSelect(platforms);
+
+      // Render filtered view
+      const grid = document.getElementById("grid");
+
+      const viewFiltered = CATALOG.filter(viewPasses);
+
+      grid.innerHTML = viewFiltered.map(courseCard).join("");
+
+      // Update counters after filters (search/platform) applied
+      applyFilters();
+
+      setActivePillUI();
+    }
+
+    // =========================
+    // SEARCH + PLATFORM FILTER
+    // =========================
+    function applyFilters(){
+      const q = document.getElementById("searchInput").value.trim().toLowerCase();
+      const platform = (ACTIVE_PLATFORM || "__all__").toLowerCase();
+
+      const items = document.querySelectorAll(".courseItem");
+      let visible = 0;
+
+      items.forEach(el=>{
+        const title = el.getAttribute("data-title") || "";
+        const provider = el.getAttribute("data-provider") || "";
+        const tags = el.getAttribute("data-tags") || "";
+        const p = el.getAttribute("data-platform") || "";
+
+        const matchQuery = !q || title.includes(q) || provider.includes(q) || tags.includes(q);
+        const matchPlatform = (platform === "__all__") || (p === platform);
+
+        const show = matchQuery && matchPlatform;
+        el.style.display = show ? "flex" : "none";
+        if(show) visible++;
+      });
+
+      document.getElementById("resultCount").textContent = `${visible} items`;
+      document.getElementById("totalCount").textContent = String(visible);
+
+      const empty = document.getElementById("emptyState");
+      if(visible === 0) empty.classList.remove("hidden");
+      else empty.classList.add("hidden");
+
+      updateActivePlatformUI();
+    }
+
+    // =========================
+    // IDENTITY LOAD
+    // =========================
+    function patternFromResult(r){
+      const key = (r?.label || "").toLowerCase();
+
+      const labelMap = {
+        visual_spatial: "Visual-Spatial",
+        logical: "Logical",
+        verbal: "Verbal",
+        focus: "Focus",
+        auditory: "Auditory"
+      };
+
+      const patternMap = {
+        visual_spatial: "visual",
+        logical: "logical",
+        verbal: "verbal",
+        focus: "focus",
+        auditory: "auditory"
+      };
+
+      USER_PATTERN_DISPLAY = r?.label_display || labelMap[key] || "Visual-Spatial";
+      USER_PATTERN = patternMap[key] || "visual";
+    }
+
+    async function loadIdentity(){
+      // 1) try api
+      try{
+        const res = await fetch('api/me.php', { credentials:"include" });
+        const data = await res.json();
+        if(data.ok && data.user && data.user.lastResult){
+          const r = typeof data.user.lastResult === "string" ? JSON.parse(data.user.lastResult) : data.user.lastResult;
+          patternFromResult(r);
+          document.getElementById("patternDisplay").textContent = USER_PATTERN_DISPLAY;
+          document.getElementById("modalPatternWord").textContent = USER_PATTERN_DISPLAY.split("-")[0] || "Visual";
+          render();
+          return;
+        }
+      }catch(e){}
+
+      // 2) fallback sessionStorage
+      try{
+        const raw = sessionStorage.getItem("ng_result");
+        if(raw){
+          const r = JSON.parse(raw);
+          patternFromResult(r);
+          document.getElementById("patternDisplay").textContent = USER_PATTERN_DISPLAY;
+          document.getElementById("modalPatternWord").textContent = USER_PATTERN_DISPLAY.split("-")[0] || "Visual";
+          render();
+        }
+      }catch(e){}
+    }
+
+    // =========================
+    // Transform Engine (Demo)
+    // =========================
+    function normalize(s){ return (s||"").toLowerCase(); }
+
+    function detectCourseDomain(course){
+      const title = normalize(course.title);
+      const tags  = (course.tags || []).map(normalize);
+      const prov  = normalize(course.provider);
+      const has = (k)=> title.includes(k) || tags.some(t=>t.includes(k)) || prov.includes(k);
+
+      if(has("dbms") || has("database") || has("sql")) return "DBMS";
+      if(has("algorithms") || has("dsa") || has("discrete") || has("proof")) return "THEORY";
+      if(has("os") || has("operating")) return "SYSTEMS";
+      return "GENERAL";
+    }
+
+    const TRANSFORM_TEMPLATES = {
+      DBMS: {
+        map: [
+          "Database → Tables → (Fields / Records)",
+          "Primary Key = unique identity for each record",
+          "Foreign Key = relationship bridge between tables"
+        ],
+        keywords: ["Database","Table","Field","Record","Primary Key","Foreign Key","Relationship","SQL","Schema","ERD","Join","Index","Transaction","ACID"],
+        outputs: [
+          "Entity relationship map (ERD)",
+          "Flow: query → engine → filtered rows → result",
+          "Mini diagrams: PK/FK + cardinalities"
+        ],
+        flashcards: [
+          ["Primary Key?", "Unique identity for each record (no duplicates)."],
+          ["Foreign Key?", "Reference to another table’s Primary Key (relationship bridge)."],
+          ["JOIN mental model?", "Combine rows from two tables using a key match."],
+          ["Why visual helps DBMS?", "Because DB understanding = relationships + structure."]
+        ]
+      },
+      THEORY: {
+        map: [
+          "Definition → Intuition → Example → Counterexample",
+          "Proof idea = steps map (why each step exists)",
+          "Algorithm = flowchart + invariants"
+        ],
+        keywords: ["Definition","Intuition","Example","Proof","Invariant","Complexity","Flowchart","Edge case","Counterexample","Big-O","Recurrence","Correctness"],
+        outputs: [
+          "Proof storyboard (step-by-step boxes)",
+          "Algorithm flowchart + invariants",
+          "Complexity cheat sheet"
+        ],
+        flashcards: [
+          ["What is an invariant?", "A rule that stays true at key points in the algorithm."],
+          ["How to read a proof visually?", "Turn each statement into a box connected by ‘because’ arrows."],
+          ["Big-O means?", "How runtime grows as input size grows."],
+          ["Visual trick?", "One theorem = one map + one example + one edge case."]
+        ]
+      },
+      SYSTEMS: {
+        map: [
+          "OS = manager of CPU, Memory, IO",
+          "Process ↔ Thread ↔ Scheduler",
+          "Memory: virtual → pages → frames"
+        ],
+        keywords: ["Process","Thread","Scheduler","Context switch","Virtual Memory","Paging","Kernel","Syscall","Deadlock","Semaphore","Mutex","IO"],
+        outputs: [
+          "OS components map",
+          "Scheduling timeline diagram",
+          "Memory paging diagram"
+        ],
+        flashcards: [
+          ["Process vs Thread?", "Process has its own memory; threads share memory inside a process."],
+          ["Context switch?", "CPU swaps from one process/thread to another (save/restore state)."],
+          ["Paging?", "Split memory into pages/frames to manage virtual memory."],
+          ["Deadlock?", "Processes waiting forever due to circular resource lock."]
+        ]
+      },
+      GENERAL: {
+        map: [
+          "Course → Modules → Concepts → Examples → Practice → Review",
+          "Visual plan: mindmap + diagrams + flashcards",
+          "Revision: redraw + recall"
+        ],
+        keywords: ["Module","Concept","Example","Practice","Recall","Mindmap","Diagram","Cheat sheet"],
+        outputs: [
+          "Mindmap overview",
+          "Flow diagram summary",
+          "Flashcards + quick quiz"
+        ],
+        flashcards: [
+          ["Visual strategy?", "One concept = one diagram + one example."]
+        ]
+      }
+    };
+
+    function pickKeywords(template, course){
+      const tagWords = (course.tags || [])
+        .map(t => t.replace(/[-_]/g," "))
+        .flatMap(t => t.split(" "))
+        .filter(Boolean)
+        .map(w => w[0].toUpperCase() + w.slice(1));
+
+      const base = template.keywords.slice(0, 10);
+      return [...new Set([...base, ...tagWords])].slice(0, 14);
+    }
+
+    function buildConceptMap(template, course){
+      const root = course.title.split("—")[0].trim();
+      const lines = template.map.slice(0, 3);
+      return `
+        <div class="text-white/85 font-extrabold">${escapeHtml(root)}</div>
+        <div class="mt-2 text-white/55 text-sm leading-relaxed">
+          ${lines.map(l => `• ${escapeHtml(l)}`).join("<br>")}
+        </div>
+      `;
+    }
+
+    function saveTransformedPayload(course){
+      const domain = detectCourseDomain(course);
+      const template = TRANSFORM_TEMPLATES[domain] || TRANSFORM_TEMPLATES.GENERAL;
+
+      const payload = {
+        courseId: course.id,
+        title: course.title,
+        provider: course.provider,
+        url: course.url,
+        videoId: course.videoId || null,
+        domain,
+        pattern: USER_PATTERN,
+        pattern_display: USER_PATTERN_DISPLAY,
+        keywords: pickKeywords(template, course),
+        conceptMapLines: template.map.slice(0,3),
+        outputs: template.outputs,
+        flashcards: template.flashcards,
+        generatedAt: new Date().toISOString()
+      };
+
+      sessionStorage.setItem(`ng_transform_${course.id}`, JSON.stringify(payload));
+      return payload;
+    }
+
+    function renderTransformPreview(course){
+      const domain = detectCourseDomain(course);
+      const template = TRANSFORM_TEMPLATES[domain] || TRANSFORM_TEMPLATES.GENERAL;
+
+      const out = document.getElementById("transformOutput");
+      out.classList.remove("hidden");
+
+      document.getElementById("conceptMapBox").innerHTML = buildConceptMap(template, course);
+
+      const kws = pickKeywords(template, course);
+      document.getElementById("keywordsBox").innerHTML = kws.map(k => `
+        <span class="px-3 py-2 rounded-full text-[11px] font-black tracking-widest uppercase
+          border border-white/10 bg-white/5 text-white/70">${escapeHtml(k)}</span>
+      `).join("");
+
+      document.getElementById("outputsBox").innerHTML =
+        template.outputs.map(x => `<li>${escapeHtml(x)}</li>`).join("");
+
+      document.getElementById("flashcardsBox").innerHTML =
+        template.flashcards.slice(0,4).map(([q,a]) => `
+          <div class="course-mini">
+            <div class="text-[11px] font-black tracking-[0.30em] uppercase text-sky-300">Q</div>
+            <div class="mt-1 text-white/85 text-sm font-extrabold">${escapeHtml(q)}</div>
+            <div class="mt-2 text-[11px] font-black tracking-[0.30em] uppercase text-emerald-300">A</div>
+            <div class="mt-1 text-white/60 text-sm">${escapeHtml(a)}</div>
+          </div>
+        `).join("");
+
+      document.getElementById("copyKeywordsBtn").onclick = async ()=>{
+        try{
+          await navigator.clipboard.writeText(kws.join(", "));
+          const btn = document.getElementById("copyKeywordsBtn");
+          btn.textContent = "Copied ✅";
+          setTimeout(()=> btn.textContent = "Copy keywords", 1200);
+        }catch(e){
+          alert("Copy failed (browser blocked clipboard).");
+        }
+      };
+
+      document.getElementById("regenBtn").onclick = ()=>{
+        renderTransformPreview(course);
+      };
+    }
+
+    // =========================
+    // MODAL LOGIC
+    // =========================
+    let CURRENT_TRANSFORM_COURSE = null;
+
+    function openTransform(courseId){
+      const c = CATALOG.find(x => x.id === courseId);
+      if(!c) return;
+
+      CURRENT_TRANSFORM_COURSE = c;
+      document.getElementById("tTitle").textContent = c.title;
+      document.getElementById("tProvider").textContent = c.provider;
+
+      document.getElementById("demoResult").classList.add("hidden");
+      document.getElementById("transformOutput").classList.add("hidden");
+      document.getElementById("transformBackdrop").style.display = "flex";
+    }
+    window.openTransform = openTransform;
+
+    function closeTransform(){
+      document.getElementById("transformBackdrop").style.display = "none";
+    }
+
+    // =========================
+    // INIT FROM URL
+    // =========================
+    function initFromUrl(){
+      const platform = getQueryParam("platform");
+      const view = getQueryParam("filter"); // best | needs | all
+
+      if(platform && platform.trim()){
+        ACTIVE_PLATFORM = platform.trim();
+        document.getElementById("platformSelect").value = ACTIVE_PLATFORM;
+      }else{
+        ACTIVE_PLATFORM = "__all__";
+      }
+
+      if(view && ["best","needs","all"].includes(view)){
+        ACTIVE_VIEW = view;
+      }else{
+        ACTIVE_VIEW = "best"; // default For You
+      }
+
+      setActivePillUI();
+      updateActivePlatformUI();
+    }
+
+    // =========================
+    // EVENTS
+    // =========================
+    document.getElementById("searchInput").addEventListener("input", applyFilters);
+
+    document.getElementById("platformSelect").addEventListener("change", (e)=>{
+      ACTIVE_PLATFORM = e.target.value || "__all__";
+      setQueryParam("platform", ACTIVE_PLATFORM === "__all__" ? null : ACTIVE_PLATFORM);
+      applyFilters();
+    });
+
+    document.getElementById("clearBtn").addEventListener("click", ()=>{
+      document.getElementById("searchInput").value = "";
+      ACTIVE_PLATFORM = "__all__";
+      document.getElementById("platformSelect").value = "__all__";
+      setQueryParam("platform", null);
+      applyFilters();
+    });
+
+    // Pills
+    function setView(filter){
+      ACTIVE_VIEW = filter;
+      setQueryParam("filter", filter);
+      render(); // re-render because view changes the catalog set
+    }
+
+    document.getElementById("pillForYou").addEventListener("click", ()=> setView("best"));
+    document.getElementById("pillNeeds").addEventListener("click", ()=> setView("needs"));
+    document.getElementById("pillAll").addEventListener("click", ()=> setView("all"));
+
+    // Modal
+    document.getElementById("closeTransform").addEventListener("click", closeTransform);
+    document.getElementById("transformBackdrop").addEventListener("click", (e)=>{
+      if(e.target.id === "transformBackdrop") closeTransform();
+    });
+
+    document.getElementById("demoTransformBtn").addEventListener("click", ()=>{
+      document.getElementById("demoResult").classList.remove("hidden");
+      if(!CURRENT_TRANSFORM_COURSE) return;
+
+      saveTransformedPayload(CURRENT_TRANSFORM_COURSE);
+      renderTransformPreview(CURRENT_TRANSFORM_COURSE);
+
+      setTimeout(()=>{
+        document.getElementById("transformOutput")?.scrollIntoView({ behavior:"smooth", block:"start" });
+      }, 80);
+    });
+
+    document.getElementById("openFullTransformed").addEventListener("click", ()=>{
+      if(!CURRENT_TRANSFORM_COURSE) return;
+
+      const key = `ng_transform_${CURRENT_TRANSFORM_COURSE.id}`;
+      if(!sessionStorage.getItem(key)){
+        saveTransformedPayload(CURRENT_TRANSFORM_COURSE);
+      }
+      window.location.href = `transformed-lesson.html?courseId=${encodeURIComponent(CURRENT_TRANSFORM_COURSE.id)}`;
+    });
+
+    // =========================
+    // START
+    // =========================
+    render();          // initial render
+    initFromUrl();     // apply URL view/platform
+    applyFilters();    // apply search/platform
+    loadIdentity();    // update pattern + re-render
+  </script>
+</body>
+</html>
