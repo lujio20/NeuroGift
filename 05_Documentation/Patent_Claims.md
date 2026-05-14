@@ -93,10 +93,30 @@ Repository: github.com/lujio20/NeuroGift (private)
 
 ---
 
-## Inventors
+## Team & Supervision
 
-- [اسم المخترع الأول]
-- [اسم المخترع الثاني — إن وجد]
+### Project Leader
+**Lujain Ahmed Ati — لجين أحمد عاتي**
+- Role: Project Lead, Web Developer, Database Engineer
+- - University: Jazan University
+ 
+  - ### Team Members
+ 
+  - | Name | Role | University |
+  - |---|---|---|
+  - | Byadir Ibrahim Al-Qadi — بيادر إبراهيم القاضي | UI/UX Designer (Figma) | Jazan University |
+  - | Jana Ali Ghurawi — جنا علي غروي | UI/UX Designer (Figma) | Jazan University |
+  - | Yara Taher Mubaraki — يارا طاهر مباركي | Data Analyst & AI Model Developer | King Khalid University |
+ 
+  - ### Project Supervisor
+  - **Dr. Ahmed Jabril Ati — د. أحمد جبريل عاتي**
+  - - Specialization: Administration and Educational Supervision
+    - - Qualification: Doctorate in Administration and Educational Supervision
+     
+      - ---
 
-**Institution:** [اسم الجامعة أو المؤسسة]
-**Country:** Saudi Arabia
+      ## Institutions
+      - Jazan University — جامعة جازان
+      - - King Khalid University — جامعة الملك خالد
+       
+        - **Country:** Saudi Arabia
