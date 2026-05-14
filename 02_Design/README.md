@@ -19,6 +19,7 @@ Designers: Byadir Ibrahim Al-Qadi & Jana Ali Ghurawi - Jazan University
 ## User Flow
 
 Start > Landing Page > Auth (Sign Up / Login) > Onboarding > EEG Device Connect > Cognitive Assessment > AI Analysis > Brain Dashboard > Personalized Courses > (optional) AI Transform > Profile
+neurogift_user_flow.svg
 
 ## Design System
 
