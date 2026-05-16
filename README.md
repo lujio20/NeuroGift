@@ -48,7 +48,7 @@ AI Model 2 — Content Transformation Engine
 | Algorithm | Random Forest Classifier |
 | Training data | 2,803,517 EEG samples |
 | Classes | 5 intelligence types |
-| Accuracy | 99.99% |
+| Accuracy | 87.95% |
 | File | `NeuroGift_Final_Model.pkl` |
 
 ### Model 2 — Content Transformation Engine
